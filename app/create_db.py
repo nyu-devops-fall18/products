@@ -6,3 +6,6 @@ def dbcreate():
     Product(3,'Tulips', 'Tulip Sticks', 'Stem', 'Boxed', 900, " ", 8).save()
     Product(4,'Sunflower', 'Sunflower Sticks', 'Stem', 'Boxed', 300, " ", 10).save()
     Product(5,'Sunflower Petals', 'Petals of Sunflower', 'Leaf', 'Boxed', 2000, " ", 7).save()
+
+def dberase():
+    Product.query.delete()
