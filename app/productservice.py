@@ -11,7 +11,22 @@ from app.create_db import dbcreate
 def index():
     app.logger.info(Product.query.all())
     return jsonify(name="Product Data API Service",
-                   version='1.0'), status.HTTP_200_OK
+                   version='1.0', path=url_for("pricerange")), status.HTTP_200_OK
+
+@app.route("/products/pricerange", methods=["GET"])
+def pricerange():
+    app.logger.info("Fetching products by provided price range")
+    app.logger.info(request.args.get('minimum'))
+    minimum = request.args.get('minimum')
+    maximum = request.args.get('maximum')
+    tlist = list(Product.search_by_price(minimum,maximum))
+    result = []
+    for i in tlist:
+        result.append(i.serialize())
+    app.logger.info(result)
+    #result.append(i[0] for i in Product.search_by_price(minimum,maximum))
+    #app.logger.info(result)
+    return make_response(jsonify(result), status.HTTP_200_OK)
 
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
