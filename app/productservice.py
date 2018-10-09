@@ -9,6 +9,7 @@ from app.create_db import dbcreate
 
 @app.route("/")
 def index():
+    app.logger.info(Product.query.all())
     return jsonify(name="Product Data API Service",
                    version='1.0'), status.HTTP_200_OK
 

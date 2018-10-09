@@ -31,11 +31,17 @@ class Product(db.Model):
         self.rating = prat
 
     def __repr__(self):
-        return '<Product %r>'.format(self.name)
+        return '<Product %r>' % (self.name)
 
     def save(self):
-        # if not self.id:
-        db.session.add(self)
+        if not self.id:
+            db.session.add(self)
+        elif self.id in Product.query.all():
+            lastproduct = Product.query.order_by(Product.id.desc()).first()
+            self.id = lastproduct.id + 1
+            db.session.add(self)
+        else:
+            db.session.add(self)
         db.session.commit()
 
     def delete(self):
