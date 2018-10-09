@@ -55,7 +55,7 @@ class Product(db.Model):
         db.session.commit()
 
     def serialize(self):
-        return {"name": self.name, "description":self.description, "category": self.category, "price" : self.price,
+        return {"id": self.id, "name": self.name, "description":self.description, "category": self.category, "price" : self.price,
                 "condition" : self.condition, "inventory": self.inventory, "review": self.review, "rating": self.rating}
 
     def deserialize(self, productdata):
