@@ -10,7 +10,7 @@ from app.create_db import dbcreate
 @app.route("/")
 def index():
     return jsonify(name="Product Data API Service",
-                   version='1.0',), status.HTTP_200_OK
+                   version='1.0'), status.HTTP_200_OK
 
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """

@@ -34,8 +34,8 @@ class Product(db.Model):
         return '<Product %r>'.format(self.name)
 
     def save(self):
-        if not self.id:
-            db.session.add(self)
+        # if not self.id:
+        db.session.add(self)
         db.session.commit()
 
     def delete(self):

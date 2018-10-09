@@ -11,5 +11,6 @@ if __name__ == "__main__":
     # print "****************************************"
     productservice.initialize_logging()
     productservice.init_db()
-    # create_db.dbcreate()
+    create_db.dberase()
+    create_db.dbcreate()
     app.run(host='127.0.0.1', port=int(PORT), debug=DEBUG)
