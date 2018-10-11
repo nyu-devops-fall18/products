@@ -10,7 +10,7 @@ app.config['SECRET_KEY'] = 'Shhhh'
 app.config['LOGGING_LEVEL'] = logging.INFO
 
 # Set up logging for production
-print 'Setting up logging for {}...'.format(__name__)
+print('Setting up logging for {}...'.format(__name__))
 if __name__ != '__main__':
     gunicorn_logger = logging.getLogger('gunicorn.error')
     if gunicorn_logger:
