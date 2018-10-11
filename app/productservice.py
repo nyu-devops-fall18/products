@@ -48,7 +48,7 @@ def pricerange():
 def getaveragerating(item_id):
     app.logger.info("Fetching the average rating of product")
     check_content_type("application/json")
-    product = Product.rating_product(item_id)
+    product = Product.find_by_id(item_id)
     # app.logger.info(product.rating)
     # prevrating = product.rating
     hitcount = product.updateCount
@@ -61,6 +61,15 @@ def getaveragerating(item_id):
     product.rating = product.totalrating/(hitcount+1)
     product.update()
     return make_response("Rating updated",status.HTTP_204_NO_CONTENT)
+
+@app.route("/products/<int:item_id>", methods=["DELETE"])
+def deleteproduct(item_id):
+    app.logger.info("Deleting the product for the id provided")
+    product = Product.find_by_id(item_id)
+    if not product:
+        raise NotFound("Product with id {} not found".format(item_id))
+    product.delete()
+    return make_response(" ", status.HTTP_204_NO_CONTENT)
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """
