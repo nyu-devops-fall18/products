@@ -1,6 +1,8 @@
 import logging
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 from datetime import datetime
+
 
 db = SQLAlchemy()
 
@@ -61,6 +63,22 @@ class Product(db.Model):
         self.updateCount+=1
         db.session.add(self)
         db.session.commit()
+
+    @staticmethod
+    def all():
+        """ Returns all of the products in the database """
+        Product.logger.info('Processing all Products')
+        return Product.query.all()
+
+    @staticmethod
+    def find_by_name(name):
+        Product.logger.info('Processing by name = %s', name)
+        return Product.query.filter(func.lower(Product.name) == func.lower(name))
+
+    @staticmethod
+    def find_by_category(category):
+        Product.logger.info('Processing by category = %s', category)
+        return Product.query.filter(func.lower(Product.category) == func.lower(category))
 
     def delete(self):
         db.session.remove(self)

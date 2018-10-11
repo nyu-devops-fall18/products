@@ -12,6 +12,25 @@ def index():
     return jsonify(name="Product Data API Service",
                    version='1.0', path=url_for("pricerange")), status.HTTP_200_OK
 
+# LIST ALL FLOWERS
+@app.route('/products', methods=['GET'])
+def list_products():
+     """ Return all the flowers"""
+     flowers = []
+     name = request.args.get('name')
+     app.logger.info(name)
+     category = request.args.get('category')
+     if name:
+         flowers = Product.find_by_name(name)
+     elif category:
+         flowers = Product.find_by_category(category)
+     else:
+         flowers = Product.all()
+
+     results = [flower.serialize() for flower in flowers]
+     return make_response(jsonify(results), status.HTTP_200_OK)
+
+
 @app.route("/products/pricerange", methods=["GET"])
 def pricerange():
     app.logger.info("Fetching products by provided price range")
@@ -75,4 +94,3 @@ def init_db():
     """ Initialies the SQLAlchemy app """
     global app
     Product.init_db(app)
-
