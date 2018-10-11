@@ -33,16 +33,16 @@ def list_products():
 ####################
 # list products by ID
 ####################
-@app.route('/products/<int:item_id>', methods=['GET'])
+@app.route('/products/<int:item_id>', methods=["GET"])
 def list_products_by_id(item_id):
     app.logger.info('Finding a Product with id [{}]'.format(item_id))
     product = Product.find_by_id(item_id)
     if product:
         message = product.serialize()
-        return_code = HTTP_200_OK
+        return_code = status.HTTP_200_OK
     else:
         message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-        return_code = HTTP_404_NOT_FOUND
+        return_code = status.HTTP_404_NOT_FOUND
 
     return jsonify(message), return_code
 
