@@ -1,6 +1,8 @@
 import logging
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
+from datetime import datetime
+
 
 db = SQLAlchemy()
 
@@ -21,8 +23,11 @@ class Product(db.Model):
     inventory = db.Column(db.Integer)
     review = db.Column(db.String(511))
     rating = db.Column(db.Integer)
+    updateddate = db.Column(db.String(63))
+    updateCount = db.Column(db.Integer)
+    totalrating = db.Column(db.Integer)
 
-    def __init__(self,pid,pname,pdesc,pcat,pprice,pcond,pinv,prev,prat):
+    def __init__(self,pid,pname,pdesc,pcat,pprice,pcond,pinv,prev,prat,pdate,pupdated=1):
         self.id = pid
         self.name = pname
         self.description = pdesc
@@ -32,6 +37,9 @@ class Product(db.Model):
         self.inventory = pinv
         self.review = prev
         self.rating = prat
+        self.updateddate = str(datetime.now())
+        self.updateCount = pupdated
+        self.totalrating = prat
 
     def __repr__(self):
         return '<Product %r>' % (self.name)
@@ -49,6 +57,11 @@ class Product(db.Model):
             db.session.add(self)
         else:
             db.session.add(self)
+        db.session.commit()
+
+    def update(self):
+        self.updateCount+=1
+        db.session.add(self)
         db.session.commit()
 
     @staticmethod
@@ -73,7 +86,7 @@ class Product(db.Model):
 
     def serialize(self):
         return {"id": self.id, "name": self.name, "description":self.description, "category": self.category, "price" : self.price,
-                "condition" : self.condition, "inventory": self.inventory, "review": self.review, "rating": self.rating}
+                "condition" : self.condition, "inventory": self.inventory, "review": self.review, "rating": self.rating, "updatedDate" : self.updateddate}
 
     def deserialize(self, productdata):
         if not isinstance(productdata, dict):
@@ -87,6 +100,8 @@ class Product(db.Model):
             self.inventory = productdata['inventory']
             self.review = productdata['review']
             self.rating = productdata['rating']
+            self.updateddate = str(datetime.now())
+            self.totalrating += productdata['rating']
         except KeyError as err:
             raise ValidationError('Invalid product: missing ' + err.args[0])
         return self
@@ -105,3 +120,15 @@ class Product(db.Model):
     def search_by_price(minimum, maximum):
         Product.logger.info("Searching for all products within the price range of minimum to maximum")
         return Product.query.filter((Product.price.between(minimum,maximum)))
+
+    @staticmethod
+    def rating_product(product_id):
+        Product.logger.info("Adding the rating to product and storing the average")
+        Product.logger.info(product_id)
+        Product.logger.info(Product.query.get(product_id))
+        return Product.query.get(product_id)
+
+    @staticmethod
+    def all():
+        Product.logger.info("Listing all products")
+        return Product.query.all()
