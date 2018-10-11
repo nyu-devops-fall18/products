@@ -45,7 +45,7 @@ def pricerange():
     return make_response(jsonify(result), status.HTTP_200_OK)
 
 @app.route("/products/<int:item_id>", methods=["PUT"])
-def getaveragerating(item_id):
+def update_product(item_id):
     app.logger.info("Fetching the average rating of product")
     check_content_type("application/json")
     product = Product.find_by_id(item_id)
