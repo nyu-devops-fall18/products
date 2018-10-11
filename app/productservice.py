@@ -62,6 +62,23 @@ def getaveragerating(item_id):
     product.update()
     return make_response("Rating updated",status.HTTP_204_NO_CONTENT)
 
+# @app.route('/products/<int:item_id>', methods=['PUT'])
+# def update_products(item_id):
+#     app.logger.info('Updating a product with id [{}]'.format(item_id))
+#     item = Product.find_by_id(item_id)
+#     if product:
+#         payload = request.get_json()
+#         product.deserialize(payload)
+#         product.id = pet_id
+#         product.save()
+#         message = product.serialize()
+#         return_code = HTTP_200_OK
+#     else:
+#         message = {'error' : 'Product with id: %s was not found' % str(item_id)}
+#         return_code = HTTP_404_NOT_FOUND
+#
+#     return jsonify(message), return_code
+
 def check_content_type(content_type):
     """ Checks that the media type is correct """
     app.logger.info(request.headers)
