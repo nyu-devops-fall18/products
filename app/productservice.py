@@ -5,7 +5,6 @@ from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 from app.productmodel import Product, ValidationError
-from app.create_db import dbcreate
 
 @app.route("/")
 def index():
@@ -16,17 +15,41 @@ def index():
 @app.route("/products/pricerange", methods=["GET"])
 def pricerange():
     app.logger.info("Fetching products by provided price range")
-    app.logger.info(request.args.get('minimum'))
+    # app.logger.info(request.args.get('minimum'))
     minimum = request.args.get('minimum')
     maximum = request.args.get('maximum')
     tlist = list(Product.search_by_price(minimum,maximum))
     result = []
     for i in tlist:
         result.append(i.serialize())
-    app.logger.info(result)
-    #result.append(i[0] for i in Product.search_by_price(minimum,maximum))
-    #app.logger.info(result)
+    # app.logger.info(result)
     return make_response(jsonify(result), status.HTTP_200_OK)
+
+@app.route("/products/<int:item_id>", methods=["PUT"])
+def getaveragerating(item_id):
+    app.logger.info("Fetching the average rating of product")
+    check_content_type("application/json")
+    product = Product.rating_product(item_id)
+    # app.logger.info(product.rating)
+    prevrating = product.rating
+    hitcount = product.updateCount
+    if not product:
+        raise NotFound("Product with id {} not found".format(item_id))
+    # app.logger.info(product.deserialize(request.get_json()))
+    product.deserialize(request.get_json())
+    product.id = item_id
+    # app.logger.info(product.rating)
+    product.rating = product.totalrating/(hitcount+1)
+    product.update()
+    return make_response("Rating updated",status.HTTP_204_NO_CONTENT)
+
+def check_content_type(content_type):
+    """ Checks that the media type is correct """
+    app.logger.info(request.headers)
+    if request.headers['Content-Type'] == content_type:
+        return
+    app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
+    abort(415, 'Content-Type must be {}'.format(content_type))
 
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
@@ -52,3 +75,4 @@ def init_db():
     """ Initialies the SQLAlchemy app """
     global app
     Product.init_db(app)
+
