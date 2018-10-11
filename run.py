@@ -12,4 +12,4 @@ if __name__ == "__main__":
     productservice.initialize_logging()
     productservice.init_db()
     create_db.dbcreate()
-    app.run(host='127.0.0.1', port=int(PORT), debug=DEBUG)
+    app.run(host='0.0.0.0', port=int(PORT), debug=DEBUG)

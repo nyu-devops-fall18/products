@@ -127,8 +127,3 @@ class Product(db.Model):
         Product.logger.info(product_id)
         Product.logger.info(Product.query.get(product_id))
         return Product.query.get(product_id)
-
-    @staticmethod
-    def all():
-        Product.logger.info("Listing all products")
-        return Product.query.all()
