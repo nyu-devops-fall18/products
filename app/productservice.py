@@ -31,7 +31,7 @@ def getaveragerating(item_id):
     check_content_type("application/json")
     product = Product.rating_product(item_id)
     # app.logger.info(product.rating)
-    prevrating = product.rating
+    # prevrating = product.rating
     hitcount = product.updateCount
     if not product:
         raise NotFound("Product with id {} not found".format(item_id))
