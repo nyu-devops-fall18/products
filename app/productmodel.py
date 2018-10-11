@@ -64,24 +64,8 @@ class Product(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    @staticmethod
-    def all():
-        """ Returns all of the products in the database """
-        Product.logger.info('Processing all Products')
-        return Product.query.all()
-
-    @staticmethod
-    def find_by_name(name):
-        Product.logger.info('Processing by name = %s', name)
-        return Product.query.filter(func.lower(Product.name) == func.lower(name))
-
-    @staticmethod
-    def find_by_category(category):
-        Product.logger.info('Processing by category = %s', category)
-        return Product.query.filter(func.lower(Product.category) == func.lower(category))
-
     def delete(self):
-        db.session.remove(self)
+        db.session.delete(self)
         db.session.commit()
 
     def serialize(self):
@@ -122,8 +106,22 @@ class Product(db.Model):
         return Product.query.filter((Product.price.between(minimum,maximum)))
 
     @staticmethod
-    def rating_product(product_id):
-        Product.logger.info("Adding the rating to product and storing the average")
-        Product.logger.info(product_id)
-        Product.logger.info(Product.query.get(product_id))
+    def all():
+        """ Returns all of the products in the database """
+        Product.logger.info('Processing all Products')
+        return Product.query.all()
+
+    @staticmethod
+    def find_by_name(name):
+        Product.logger.info('Processing by name = %s', name)
+        return Product.query.filter(func.lower(Product.name) == func.lower(name))
+
+    @staticmethod
+    def find_by_category(category):
+        Product.logger.info('Processing by category = %s', category)
+        return Product.query.filter(func.lower(Product.category) == func.lower(category))
+
+    @staticmethod
+    def find_by_id(product_id):
+        Product.logger.info("Finding a product")
         return Product.query.get(product_id)

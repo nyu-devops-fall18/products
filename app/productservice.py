@@ -45,10 +45,10 @@ def pricerange():
     return make_response(jsonify(result), status.HTTP_200_OK)
 
 @app.route("/products/<int:item_id>", methods=["PUT"])
-def getaveragerating(item_id):
+def update_product(item_id):
     app.logger.info("Fetching the average rating of product")
     check_content_type("application/json")
-    product = Product.rating_product(item_id)
+    product = Product.find_by_id(item_id)
     # app.logger.info(product.rating)
     # prevrating = product.rating
     hitcount = product.updateCount
@@ -62,22 +62,14 @@ def getaveragerating(item_id):
     product.update()
     return make_response("Rating updated",status.HTTP_204_NO_CONTENT)
 
-# @app.route('/products/<int:item_id>', methods=['PUT'])
-# def update_products(item_id):
-#     app.logger.info('Updating a product with id [{}]'.format(item_id))
-#     item = Product.find_by_id(item_id)
-#     if product:
-#         payload = request.get_json()
-#         product.deserialize(payload)
-#         product.id = pet_id
-#         product.save()
-#         message = product.serialize()
-#         return_code = HTTP_200_OK
-#     else:
-#         message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-#         return_code = HTTP_404_NOT_FOUND
-#
-#     return jsonify(message), return_code
+@app.route("/products/<int:item_id>", methods=["DELETE"])
+def deleteproduct(item_id):
+    app.logger.info("Deleting the product for the id provided")
+    product = Product.find_by_id(item_id)
+    if not product:
+        raise NotFound("Product with id {} not found".format(item_id))
+    product.delete()
+    return make_response(" ", status.HTTP_204_NO_CONTENT)
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """
