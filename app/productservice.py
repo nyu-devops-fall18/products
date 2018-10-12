@@ -6,13 +6,58 @@ from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 from app.productmodel import Product, ValidationError
 
+#########################
+# error handlers
+#########################
+@app.errorhandler(ValidationError)
+def request_validation_error(error):
+    """ Handles Value Errors from bad data """
+    return bad_request(error)
+
+@app.errorhandler(400)
+def bad_request(error):
+    """ Handles bad reuests with 400_BAD_REQUEST """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=400, error='Bad Request', message=message), 400
+
+@app.errorhandler(404)
+def not_found(error):
+    """ Handles resources not found with 404_NOT_FOUND """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=404, error='Not Found', message=message), 404
+
+@app.errorhandler(405)
+def method_not_supported(error):
+    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=405, error='Method not Allowed', message=message), 405
+
+@app.errorhandler(415)
+def mediatype_not_supported(error):
+    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=415, error='Unsupported media type', message=message), 415
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    """ Handles unexpected server error with 500_SERVER_ERROR """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=500, error='Internal Server Error', message=message), 500
+
 @app.route("/")
 def index():
     app.logger.info(Product.query.all())
     return jsonify(name="Product Data API Service",
                    version='1.0', path=url_for("pricerange")), status.HTTP_200_OK
 
-# LIST ALL FLOWERS
+#########################
+# list all products
+#########################
 @app.route('/products', methods=['GET'])
 def list_products():
      """ Return all the flowers"""
@@ -30,9 +75,9 @@ def list_products():
      results = [flower.serialize() for flower in flowers]
      return make_response(jsonify(results), status.HTTP_200_OK)
 
-####################
+#########################
 # list products by ID
-####################
+#########################
 @app.route('/products/<int:item_id>', methods=["GET"])
 def list_products_by_id(item_id):
     app.logger.info('Finding a Product with id [{}]'.format(item_id))
@@ -46,6 +91,9 @@ def list_products_by_id(item_id):
 
     return jsonify(message), return_code
 
+#########################
+# list products by price range
+#########################
 @app.route("/products/pricerange", methods=["GET"])
 def pricerange():
     app.logger.info("Fetching products by provided price range")
@@ -59,6 +107,9 @@ def pricerange():
     # app.logger.info(result)
     return make_response(jsonify(result), status.HTTP_200_OK)
 
+#########################
+# update product by ID
+#########################
 @app.route("/products/<int:item_id>", methods=["PUT"])
 def update_product(item_id):
     app.logger.info("Fetching the average rating of product")
@@ -77,6 +128,9 @@ def update_product(item_id):
     product.update()
     return make_response("Rating updated",status.HTTP_204_NO_CONTENT)
 
+#########################
+# delete product by ID
+#########################
 @app.route("/products/<int:item_id>", methods=["DELETE"])
 def deleteproduct(item_id):
     app.logger.info("Deleting the product for the id provided")
