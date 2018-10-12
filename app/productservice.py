@@ -112,7 +112,7 @@ def pricerange():
 #########################
 @app.route("/products/<int:item_id>", methods=["PUT"])
 def update_product(item_id):
-    app.logger.info("Fetching the average rating of product")
+    app.logger.info("Fetching the product")
     check_content_type("application/json")
     product = Product.find_by_id(item_id)
     # app.logger.info(product.rating)
@@ -126,7 +126,7 @@ def update_product(item_id):
     # app.logger.info(product.rating)
     product.rating = product.totalrating/(hitcount+1)
     product.update()
-    return make_response("Rating updated",status.HTTP_204_NO_CONTENT)
+    return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
 
 #########################
 # delete product by ID
