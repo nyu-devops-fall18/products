@@ -27,7 +27,7 @@ class Product(db.Model):
     updateCount = db.Column(db.Integer)
     totalrating = db.Column(db.Integer)
 
-    def __init__(self,pid,pname,pdesc,pcat,pprice,pcond,pinv,prev,prat,pdate,pupdated=1):
+    def __init__(self,pid,pname,pdesc,pcat,pprice,pcond,pinv,prev,prat):
         self.id = pid
         self.name = pname
         self.description = pdesc
@@ -38,7 +38,7 @@ class Product(db.Model):
         self.review = prev
         self.rating = prat
         self.updateddate = str(datetime.now())
-        self.updateCount = pupdated
+        self.updateCount = 1
         self.totalrating = prat
 
     def __repr__(self):
