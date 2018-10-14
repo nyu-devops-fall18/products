@@ -75,6 +75,24 @@ def list_products():
      results = [flower.serialize() for flower in flowers]
      return make_response(jsonify(results), status.HTTP_200_OK)
 
+@app.route('/products', methods=['POST'])
+def create_products():
+    """
+    Creates a Pet
+    This endpoint will create a Pet based the data in the body that is posted
+    """
+    check_content_type('application/json')
+    product = Product(1,"","","",0,"",0,"",0)
+    product.deserialize(request.get_json())
+    product.save()
+    message = product.serialize()
+    location_url = url_for('list_products_by_id', item_id=product.id, _external=True)
+    return make_response(jsonify(message), status.HTTP_201_CREATED,
+                         {
+                             'Location': location_url
+                         })
+
+
 #########################
 # list products by ID
 #########################
