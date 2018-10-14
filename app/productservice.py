@@ -60,7 +60,7 @@ def index():
 #########################
 @app.route('/products', methods=['GET'])
 def list_products():
-     """ Return all the flowers"""
+     """ Return all the products"""
      flowers = []
      name = request.args.get('name')
      app.logger.info(name)
@@ -75,6 +75,9 @@ def list_products():
      results = [flower.serialize() for flower in flowers]
      return make_response(jsonify(results), status.HTTP_200_OK)
 
+#########################
+# create a product
+#########################
 @app.route('/products', methods=['POST'])
 def create_products():
     """
@@ -91,7 +94,6 @@ def create_products():
                          {
                              'Location': location_url
                          })
-
 
 #########################
 # list products by ID
