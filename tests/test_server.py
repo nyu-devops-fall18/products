@@ -56,8 +56,8 @@ class TestProductServer(unittest.TestCase):
         service.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
-        Product(pid=1,pname='Athens Table', pdesc='Stupid Table', pcat="Table", pcond="Boxed", pprice=20, prat=5, prev="").save()
-        Product(pid=1,pname='Rome Chair', pdesc='Stupid Chair', pcat="Chair", pcond="Boxed", pprice=40, prat=8, prev="").save()
+        Product(pid=1,pname='Athens Table', pdesc='Stupid Table', pcat="Table", pcond="Boxed", pprice=20, prat=5, prev="",pinv=2).save()
+        Product(pid=2,pname='Rome Chair', pdesc='Stupid Chair', pcat="Chair", pcond="Boxed", pprice=40, prat=8, prev="",pinv=2).save()
         self.app = service.app.test_client()
 
     def tearDown(self):
@@ -98,7 +98,7 @@ class TestProductServer(unittest.TestCase):
         # save the current number of pets for later comparison
         product_count = self.get_product_count()
         # add a new pet
-        new_product = dict(pid=1,pname='Greek Table', pdesc='Its a Table', pcat="Table", pcond="Boxed", pprice=12, prat=5, prev="")
+        new_product = dict(pid=3,pname='Greek Table', pdesc='Its a Table', pcat="Table", pcond="Boxed", pprice=12, prat=5, prev="",pinv=2)
         data = json.dumps(new_product)
         resp = self.app.post('/products',
                              data=data,
@@ -121,7 +121,7 @@ class TestProductServer(unittest.TestCase):
     def test_update_product(self):
         """ Update an existing Product """
         product = Product.find_by_name('Greek Table')[0]
-        new_product = dict(pid=1,pname='Greek Table', pdesc='Its a Table', pcat=" Fancy Table", pcond="Boxed", pprice=12, prat=5, prev="")
+        new_product = dict(pid=3,pname='Greek Table', pdesc='Its a Table', pcat=" Fancy Table", pcond="Boxed", pprice=12, prat=5, prev="", pinv=2)
         data = json.dumps(new_product)
         resp = self.app.put('/pets/{}'.format(product.id),
                             data=data,
