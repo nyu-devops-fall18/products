@@ -130,34 +130,49 @@ class TestPets(unittest.TestCase):
         pet = Pet()
         self.assertRaises(DataValidationError, pet.deserialize, data)
 
-    def test_find_pet(self):
-        """ Find a Pet by ID """
-        Pet(name="fido", category="dog", available=True).save()
-        kitty = Pet(name="kitty", category="cat", available=False)
-        kitty.save()
-        pet = Pet.find(kitty.id)
-        self.assertIsNot(pet, None)
-        self.assertEqual(pet.id, kitty.id)
-        self.assertEqual(pet.name, "kitty")
-        self.assertEqual(pet.available, False)
+    def test_find_by_id(self):
+        """ Find a Product by ID """
+        Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8).save()
+        table = Product(2, "Table", "Oak table", "Home", 150, "Boxed", 100, " ", 7)
+        table.save()
+        product = Product.find_by_id(table.id)
+        self.assertIsNot(product, None)
+        self.assertEqual(product.id, table.id)
+        self.assertEqual(product.name, "Table")
+        self.assertEqual(product.category, "Home")
+        self.assertEqual(product.description, "Oak table")
+        self.assertEqual(product.price, 150)
+        self.assertEqual(product.condition, "Boxed")
+        self.assertEqual(product.inventory, 100)
+        self.assertEqual(product.rating, 7)
 
     def test_find_by_category(self):
-        """ Find Pets by Category """
-        Pet(name="fido", category="dog", available=True).save()
-        Pet(name="kitty", category="cat", available=False).save()
-        pets = Pet.find_by_category("cat")
-        self.assertEqual(pets[0].category, "cat")
-        self.assertEqual(pets[0].name, "kitty")
-        self.assertEqual(pets[0].available, False)
+        """ Find Products by Category """
+        Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8).save()
+        Product(2, "Table", "Oak table", "Home", 150, "Boxed", 100, " ", 7).save()
+        products = Product.find_by_category("Furniture")
+        self.assertEqual(products[0].id, 1)
+        self.assertEqual(products[0].category, "Furniture")
+        self.assertEqual(products[0].name, "Couch")
+        self.assertEqual(products[0].description, "Oak table")
+        self.assertEqual(products[0].price, 200)
+        self.assertEqual(products[0].condition, "Boxed")
+        self.assertEqual(products[0].inventory, 50)
+        self.assertEqual(products[0].rating, 8)
 
     def test_find_by_name(self):
-        """ Find a Pet by Name """
-        Pet(name="fido", category="dog", available=True).save()
-        Pet(name="kitty", category="cat", available=False).save()
-        pets = Pet.find_by_name("kitty")
-        self.assertEqual(pets[0].category, "cat")
-        self.assertEqual(pets[0].name, "kitty")
-        self.assertEqual(pets[0].available, False)
+        """ Find a Product by Name """
+        Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8).save()
+        Product(2, "Table", "Oak table", "Furniture", 150, "Boxed", 100, " ", 7).save()
+        products = Product.find_by_name("Couch")
+        self.assertEqual(products[0].id, 1)
+        self.assertEqual(products[0].category, "Furniture")
+        self.assertEqual(products[0].name, "Couch")
+        self.assertEqual(products[0].description, "Oak table")
+        self.assertEqual(products[0].price, 200)
+        self.assertEqual(products[0].condition, "Boxed")
+        self.assertEqual(products[0].inventory, 50)
+        self.assertEqual(products[0].rating, 8)
 
 
 ######################################################################
