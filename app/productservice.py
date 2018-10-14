@@ -52,7 +52,7 @@ def internal_server_error(error):
 @app.route("/")
 def index():
     app.logger.info(Product.query.all())
-    return jsonify(name="Product Data API Service",
+    return jsonify(name="Product Demo REST API Service",
                    version='1.0', path=url_for("pricerange")), status.HTTP_200_OK
 
 #########################
