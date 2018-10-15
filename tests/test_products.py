@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Test cases for Pet Model
+Test cases for Product Model
 
 Test cases can be run with:
   nosetests
@@ -30,8 +30,8 @@ DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
-class TestPets(unittest.TestCase):
-    """ Test Cases for Pets """
+class TestProducts(unittest.TestCase):
+    """ Test Cases for Products """
 
     @classmethod
     def setUpClass(cls):
@@ -45,7 +45,7 @@ class TestPets(unittest.TestCase):
         pass
 
     def setUp(self):
-        Pet.init_db(app)
+        Product.init_db(app)
         db.drop_all()    # clean up the last tests
         db.create_all()  # make our sqlalchemy tables
 
@@ -53,27 +53,31 @@ class TestPets(unittest.TestCase):
         db.session.remove()
         db.drop_all()
 
-    def test_create_a_pet(self):
-        """ Create a pet and assert that it exists """
-        pet = Pet(name="fido", category="dog", available=True)
-        self.assertTrue(pet != None)
-        self.assertEqual(pet.id, None)
-        self.assertEqual(pet.name, "fido")
-        self.assertEqual(pet.category, "dog")
-        self.assertEqual(pet.available, True)
+    def test_create_a_product(self):
+        """ Create a product and assert that it exists """
+        product = Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8)
+        self.assertTrue(product != None)
+        self.assertEqual(product.id, 1)
+        self.assertEqual(product.name, "Couch")
+        self.assertEqual(product.category, "Furniture")
+        self.assertEqual(product.description, "White couch")
+        self.assertEqual(product.price, 200)
+        self.assertEqual(product.condition, "Boxed")
+        self.assertEqual(product.inventory, 50)
+        self.assertEqual(product.rating, 8)
 
-    def test_add_a_pet(self):
-        """ Create a pet and add it to the database """
-        pets = Pet.all()
-        self.assertEqual(pets, [])
-        pet = Pet(name="fido", category="dog", available=True)
-        self.assertTrue(pet != None)
-        self.assertEqual(pet.id, None)
-        pet.save()
-        # Asert that it was assigned an id and shows up in the database
-        self.assertEqual(pet.id, 1)
-        pets = Pet.all()
-        self.assertEqual(len(pets), 1)
+    def test_add_a_product(self):
+        """ Create a product and add it to the database """
+        products = Product.all()
+        self.assertEqual(products, [])
+        product = Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8)
+        self.assertTrue(product != None)
+        self.assertEqual(product.id, 1)
+        product.save()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertEqual(product.id, 1)
+        products = Product.all()
+        self.assertEqual(len(products), 1)
 
     def test_update_a_product(self):
         """ Update a Product """
@@ -99,36 +103,49 @@ class TestPets(unittest.TestCase):
         product.delete()
         self.assertEqual(len(Product.all()), 0)
 
-    def test_serialize_a_pet(self):
-        """ Test serialization of a Pet """
-        pet = Pet(name="fido", category="dog", available=False)
-        data = pet.serialize()
+    def test_serialize_a_product(self):
+        """ Test serialization of a Product """
+        product = Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8)
+        data = product.serialize()
         self.assertNotEqual(data, None)
         self.assertIn('id', data)
-        self.assertEqual(data['id'], None)
+        self.assertEqual(data['id'], 1)
         self.assertIn('name', data)
-        self.assertEqual(data['name'], "fido")
+        self.assertEqual(data['name'], "Couch")
         self.assertIn('category', data)
-        self.assertEqual(data['category'], "dog")
-        self.assertIn('available', data)
-        self.assertEqual(data['available'], False)
+        self.assertEqual(data['category'], "Furniture")
+        self.assertIn('description', data)
+        self.assertEqual(data['description'], "White couch")
+        self.assertIn('price', data)
+        self.assertEqual(data['price'], 200)
+        self.assertIn('condition', data)
+        self.assertEqual(data['condition'], "Boxed")
+        self.assertIn('inventory', data)
+        self.assertEqual(data['inventory'], 50)
+        self.assertIn('rating', data)
+        self.assertEqual(data['rating'], 8)
+        
 
-    def test_deserialize_a_pet(self):
-        """ Test deserialization of a Pet """
-        data = {"id": 1, "name": "kitty", "category": "cat", "available": True}
-        pet = Pet()
-        pet.deserialize(data)
-        self.assertNotEqual(pet, None)
-        self.assertEqual(pet.id, None)
-        self.assertEqual(pet.name, "kitty")
-        self.assertEqual(pet.category, "cat")
-        self.assertEqual(pet.available, True)
+    def test_deserialize_a_product(self):
+        """ Test deserialization of a Product """
+        data = {"id": 1, "name": "Couch", "description": "White couch", "category": "Furniture", "price": 200, "condition": "Boxed", "inventory": 50, "rating": 8}
+        product = Product()
+        product.deserialize(data)
+        self.assertIsNot(product, None)
+        self.assertEqual(product.id, 1)
+        self.assertEqual(product.name, "Couch")
+        self.assertEqual(product.category, "Furniture")
+        self.assertEqual(product.description, "White couch")
+        self.assertEqual(product.price, 200)
+        self.assertEqual(product.condition, "Boxed")
+        self.assertEqual(product.inventory, 50)
+        self.assertEqual(product.rating, 8)
 
     def test_deserialize_bad_data(self):
         """ Test deserialization of bad data """
         data = "this is not a dictionary"
-        pet = Pet()
-        self.assertRaises(DataValidationError, pet.deserialize, data)
+        product = Product()
+        self.assertRaises(ValidationError, product.deserialize, data)
 
     def test_find_by_id(self):
         """ Find a Product by ID """
