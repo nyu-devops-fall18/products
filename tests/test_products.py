@@ -86,7 +86,7 @@ class TestProducts(unittest.TestCase):
         self.assertEqual(product.id, 1)
         # Change it and save it
         product.category = "Home"
-        product.save()
+        product.update()
         self.assertEqual(product.id, 1)
         # Fetch it back and make sure the id hasn't changed
         # but the data did change
@@ -125,11 +125,10 @@ class TestProducts(unittest.TestCase):
         self.assertIn('rating', data)
         self.assertEqual(data['rating'], 8)
 
-
     def test_deserialize_a_product(self):
         """ Test deserialization of a Product """
-        data = {"id": 1, "name": "Couch", "description": "White couch", "category": "Furniture", "price": 200, "condition": "Boxed", "inventory": 50, "rating": 8}
-        product = Product()
+        data = {"id": 1, "name": "Couch", "description": "White couch", "category": "Furniture", "price": 200, "condition": "Boxed", "inventory": 50, "rating": 8, "review": " "}
+        product = Product(1,"","","",0,"",0,"",0)
         product.deserialize(data)
         self.assertIsNot(product, None)
         self.assertEqual(product.id, 1)
@@ -144,7 +143,7 @@ class TestProducts(unittest.TestCase):
     def test_deserialize_bad_data(self):
         """ Test deserialization of bad data """
         data = "this is not a dictionary"
-        product = Product()
+        product = Product(1,"","","",0,"",0,"",0)
         self.assertRaises(ValidationError, product.deserialize, data)
 
     def test_find_by_id(self):
@@ -171,7 +170,7 @@ class TestProducts(unittest.TestCase):
         self.assertEqual(products[0].id, 1)
         self.assertEqual(products[0].category, "Furniture")
         self.assertEqual(products[0].name, "Couch")
-        self.assertEqual(products[0].description, "Oak table")
+        self.assertEqual(products[0].description, "White couch")
         self.assertEqual(products[0].price, 200)
         self.assertEqual(products[0].condition, "Boxed")
         self.assertEqual(products[0].inventory, 50)
@@ -185,7 +184,7 @@ class TestProducts(unittest.TestCase):
         self.assertEqual(products[0].id, 1)
         self.assertEqual(products[0].category, "Furniture")
         self.assertEqual(products[0].name, "Couch")
-        self.assertEqual(products[0].description, "Oak table")
+        self.assertEqual(products[0].description, "White couch")
         self.assertEqual(products[0].price, 200)
         self.assertEqual(products[0].condition, "Boxed")
         self.assertEqual(products[0].inventory, 50)
