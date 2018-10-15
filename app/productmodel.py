@@ -129,4 +129,5 @@ class Product(db.Model):
     @staticmethod
     def sort_by_date():
         Product.logger.info("Return all products by updated date")
-        return Product.query.order_by(Product.Updateddate)
+        # Product.logger.info(Product.query.order_by(Product.updateddate.desc()))
+        return Product.query.order_by(Product.updateddate.desc())

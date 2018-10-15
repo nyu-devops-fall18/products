@@ -79,7 +79,7 @@ def list_products():
 #########################
 # Sort products by date
 #########################
-@app.route('/products?sort_by_date=asc', methods=['GET'])
+@app.route('/products/latest', methods=['GET'])
 def sort_by_date():
     """List all the product by their updated date"""
     app.logger.info("List products by updated date")

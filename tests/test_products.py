@@ -168,6 +168,24 @@ class TestProducts(unittest.TestCase):
         self.assertEqual(product.inventory, 100)
         self.assertEqual(product.rating, 7)
 
+    def test_sort_by_date(self):
+        """ Sort Products by Date """
+        Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8).save()
+        table = Product(2, "Table", "Oak table", "Home", 150, "Boxed", 100, " ", 7)
+        table.save()
+        table.price = 200
+        table.update()
+        product = list(Product.sort_by_date())[0]
+        self.assertIsNot(product, None)
+        self.assertEqual(product.id, table.id)
+        self.assertEqual(product.name, "Table")
+        self.assertEqual(product.category, "Home")
+        self.assertEqual(product.description, "Oak table")
+        self.assertEqual(product.price, 200)
+        self.assertEqual(product.condition, "Boxed")
+        self.assertEqual(product.inventory, 100)
+        self.assertEqual(product.rating, 7)
+
     def test_find_by_category(self):
         """ Find Products by Category """
         Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8).save()
