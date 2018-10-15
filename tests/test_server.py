@@ -166,6 +166,10 @@ class TestProductServer(unittest.TestCase):
         query_item = data[0]
         self.assertEqual(query_item['category'], 'Chair')
 
+    def test_method_not_allowed(self):
+        resp = self.app.put('/products')
+        self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
     @patch('app.productservice.Product.find_by_name')
     def test_bad_request(self, bad_request_mock):
         """ Test a Bad Request error from Find By Name """
