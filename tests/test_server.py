@@ -80,7 +80,7 @@ class TestProductServer(unittest.TestCase):
 
     def test_get_product(self):
         """ Get a single Product """
-        # get the id of a pet
+        # get the id of a product
         product = Product.find_by_name('Athens Table')[0]
         resp = self.app.get('/products/{}'.format(product.id),
                             content_type='application/json')
@@ -95,9 +95,9 @@ class TestProductServer(unittest.TestCase):
 
     def test_create_product(self):
         """ Create a new Product """
-        # save the current number of pets for later comparison
+        # save the current number of products for later comparison
         product_count = self.get_product_count()
-        # add a new pet
+        # add a new product
         new_product = dict(id=3, name='Greek Table', description='Its a Table', category="Table", price=12, condition="Boxed", inventory=2, review="", rating=2)
         data = json.dumps(new_product)
         resp = self.app.post('/products',
@@ -178,10 +178,10 @@ class TestProductServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     @patch('app.productservice.Product.find_by_name')
-    def test_mock_search_data(self, pet_find_mock):
+    def test_mock_search_data(self, product_find_mock):
         """ Test showing how to mock data """
-        pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'Rome Chair'})]
-        resp = self.app.get('/products', query_string='name=fido')
+        product_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'Rome Chair'})]
+        resp = self.app.get('/products', query_string='name=Rome Chair')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
 

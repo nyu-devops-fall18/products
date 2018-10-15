@@ -107,7 +107,8 @@ def list_products_by_id(item_id):
         return_code = status.HTTP_200_OK
     else:
         message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-        return_code = status.HTTP_404_NOT_FOUND
+        raise NotFound(message)
+        # return_code = status.HTTP_404_NOT_FOUND
 
     return jsonify(message), return_code
 
