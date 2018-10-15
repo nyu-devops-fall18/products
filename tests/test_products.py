@@ -124,7 +124,7 @@ class TestProducts(unittest.TestCase):
         self.assertEqual(data['inventory'], 50)
         self.assertIn('rating', data)
         self.assertEqual(data['rating'], 8)
-        
+
 
     def test_deserialize_a_product(self):
         """ Test deserialization of a Product """
