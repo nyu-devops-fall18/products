@@ -146,6 +146,12 @@ class TestProducts(unittest.TestCase):
         product = Product(1,"","","",0,"",0,"",0)
         self.assertRaises(ValidationError, product.deserialize, data)
 
+    def test_deserialize_bad_data_missing_arg(self):
+        """ Test deserialization of missing arg """
+        data = {"id": 1, "name": "Couch", "category": "Furniture", "price": 200, "condition": "Boxed", "inventory": 50, "rating": 8, "review": " "}
+        product = Product(1,"","","",0,"",0,"",0)
+        self.assertRaises(ValidationError, product.deserialize, data)
+
     def test_find_by_id(self):
         """ Find a Product by ID """
         Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8).save()
