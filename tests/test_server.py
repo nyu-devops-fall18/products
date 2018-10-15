@@ -56,8 +56,8 @@ class TestProductServer(unittest.TestCase):
         service.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
-        Product(pid=1,pname='Athens Table', pdesc='Stupid Table', pcat="Table", pcond="Boxed", pprice=20, prat=5, prev="",pinv=2).save()
-        Product(pid=2,pname='Rome Chair', pdesc='Stupid Chair', pcat="Chair", pcond="Boxed", pprice=40, prat=8, prev="",pinv=2).save()
+        Product(pid=1,pname="Athens Table", pdesc='Stupid Table', pcat="Table", pprice=20, pcond="Boxed",pinv=2, prev="", prat=5).save()
+        Product(pid=2,pname="Rome Chair", pdesc='Stupid Chair', pcat="Chair", pprice=40, pcond="Boxed", pinv=2, prev="",prat=8).save()
         self.app = service.app.test_client()
 
     def tearDown(self):
@@ -81,12 +81,12 @@ class TestProductServer(unittest.TestCase):
     def test_get_product(self):
         """ Get a single Product """
         # get the id of a pet
-        pet = Product.find_by_name('Athens Table')[0]
-        resp = self.app.get('/products/{}'.format(Product.id),
+        product = Product.find_by_name('Athens Table')[0]
+        resp = self.app.get('/products/{}'.format(product.id),
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
-        self.assertEqual(data['name'], Product.name)
+        self.assertEqual(data['name'], product.name)
 
     def test_get_product_not_found(self):
         """ Get a Product thats not found """
@@ -98,7 +98,7 @@ class TestProductServer(unittest.TestCase):
         # save the current number of pets for later comparison
         product_count = self.get_product_count()
         # add a new pet
-        new_product = dict(pid=3, pname='Greek Table', pdesc='Its a Table', pcat="Table", pcond="Boxed", pprice=12, prat=5, prev="",pinv=2)
+        new_product = dict(id=3, name='Greek Table', description='Its a Table', category="Table", price=12, condition="Boxed", inventory=2, review="", rating=2)
         data = json.dumps(new_product)
         resp = self.app.post('/products',
                              data=data,
@@ -109,7 +109,7 @@ class TestProductServer(unittest.TestCase):
         self.assertTrue(location != None)
         # Check the data is correct
         new_json = json.loads(resp.data)
-        self.assertEqual(new_json['pname'], 'Greek Table')
+        self.assertEqual(new_json['name'], 'Greek Table')
         # check that count has gone up and includes sammy
         resp = self.app.get('/products')
         # print 'resp_data(2): ' + resp.data
@@ -120,10 +120,10 @@ class TestProductServer(unittest.TestCase):
 
     def test_update_product(self):
         """ Update an existing Product """
-        product = Product.find_by_name('Greek Table')[0]
-        new_product = dict(pid=3,pname='Greek Table', pdesc='Its a Table', pcat=" Fancy Table", pcond="Boxed", pprice=12, prat=5, prev="", pinv=2)
+        product = Product.find_by_name('Athens Table')[0]
+        new_product = dict(id=1,name='Athens Table', description='Stupid Table', category="Fancy Table",price=20, condition="Boxed", inventory=2, review="", rating=8)
         data = json.dumps(new_product)
-        resp = self.app.put('/pets/{}'.format(product.id),
+        resp = self.app.put('/products/{}'.format(product.id),
                             data=data,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
@@ -132,7 +132,7 @@ class TestProductServer(unittest.TestCase):
 
     def test_delete_product(self):
         """ Delete a Product """
-        product = Product.find_by_name('Greek Table')[0]
+        product = Product.find_by_name('Athens Table')[0]
         # save the current number of products for later comparrison
         product_count = self.get_product_count()
         resp = self.app.delete('/products/{}'.format(product.id),
@@ -142,17 +142,17 @@ class TestProductServer(unittest.TestCase):
         new_count = self.get_product_count()
         self.assertEqual(new_count, product_count - 1)
 
-    def test_query_pet_list_by_category(self):
+    def test_query_product_list_by_category(self):
         """ Query Products by Category """
         resp = self.app.get('/products',
-                            query_string='category=Fancy Table')
+                            query_string='category=Chair')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         self.assertGreater(len(resp.data), 0)
-        self.assertIn('Greek Table', resp.data)
-        self.assertNotIn('Fancy Table', resp.data)
+        self.assertIn("Rome Chair", resp.data)
+        self.assertNotIn('Table', resp.data)
         data = json.loads(resp.data)
         query_item = data[0]
-        self.assertEqual(query_item['category'], 'Fancy Table')
+        self.assertEqual(query_item['category'], 'Chair')
 
     # @patch('service.Pet.find_by_name')
     # def test_bad_request(self, bad_request_mock):
