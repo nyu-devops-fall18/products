@@ -154,6 +154,18 @@ class TestProductServer(unittest.TestCase):
         query_item = data[0]
         self.assertEqual(query_item['category'], 'Chair')
 
+    def test_query_product_list_by_pricerange(self):
+        """ Query Products by PriceRange """
+        resp = self.app.get('/products/pricerange',
+                            query_string='minimum=30&maximum=50')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(resp.data), 0)
+        self.assertIn("Rome Chair", resp.data)
+        self.assertNotIn('Table', resp.data)
+        data = json.loads(resp.data)
+        query_item = data[0]
+        self.assertEqual(query_item['category'], 'Chair')
+
     @patch('app.productservice.Product.find_by_name')
     def test_bad_request(self, bad_request_mock):
         """ Test a Bad Request error from Find By Name """

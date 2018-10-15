@@ -196,6 +196,20 @@ class TestProducts(unittest.TestCase):
         self.assertEqual(products[0].inventory, 50)
         self.assertEqual(products[0].rating, 8)
 
+    def test_find_by_pricerange(self):
+        """ Find a Product by PriceRange """
+        Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8).save()
+        Product(2, "Table", "Oak table", "Furniture", 150, "Boxed", 100, " ", 7).save()
+        products = Product.search_by_price(160,210)
+        self.assertEqual(products[0].id, 1)
+        self.assertEqual(products[0].category, "Furniture")
+        self.assertEqual(products[0].name, "Couch")
+        self.assertEqual(products[0].description, "White couch")
+        self.assertEqual(products[0].price, 200)
+        self.assertEqual(products[0].condition, "Boxed")
+        self.assertEqual(products[0].inventory, 50)
+        self.assertEqual(products[0].rating, 8)
+
 
 ######################################################################
 #   M A I N
