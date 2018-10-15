@@ -20,15 +20,22 @@ def list_products():
      name = request.args.get('name')
      app.logger.info(name)
      category = request.args.get('category')
+     app.logger.info(cateogory)
+     date = request.args.get('date')
+     app.logger.info(date)
      if name:
          flowers = Product.find_by_name(name)
      elif category:
          flowers = Product.find_by_category(category)
+     elif date:
+         flowers = Product.find_by_date(date)
      else:
          flowers = Product.all()
 
      results = [flower.serialize() for flower in flowers]
      return make_response(jsonify(results), status.HTTP_200_OK)
+
+
 
 ####################
 # list products by ID
@@ -97,7 +104,7 @@ def check_content_type(content_type):
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
     if not app.debug:
-        print 'Setting up logging...'
+        print ('Setting up logging...')
         # Set up default logging for submodules to use STDOUT
         # datefmt='%m/%d/%Y %I:%M:%S %p'
         fmt = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'

@@ -125,3 +125,9 @@ class Product(db.Model):
     def find_by_id(product_id):
         Product.logger.info("Finding a product")
         return Product.query.get(product_id)
+
+    @staticmethod
+    def find_by_date(date):
+        Product.logger.info("Finding by date")
+        return Product.query.get(date)
+
