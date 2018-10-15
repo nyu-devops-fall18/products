@@ -154,19 +154,19 @@ class TestProductServer(unittest.TestCase):
         query_item = data[0]
         self.assertEqual(query_item['category'], 'Chair')
 
-    # @patch('service.Pet.find_by_name')
-    # def test_bad_request(self, bad_request_mock):
-    #     """ Test a Bad Request error from Find By Name """
-    #     bad_request_mock.side_effect = DataValidationError()
-    #     resp = self.app.get('/pets', query_string='name=fido')
-    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
-    #
-    # @patch('service.Pet.find_by_name')
-    # def test_mock_search_data(self, pet_find_mock):
-    #     """ Test showing how to mock data """
-    #     pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'fido'})]
-    #     resp = self.app.get('/pets', query_string='name=fido')
-    #     self.assertEqual(resp.status_code, status.HTTP_200_OK)
+    @patch('app.productservice.Product.find_by_name')
+    def test_bad_request(self, bad_request_mock):
+        """ Test a Bad Request error from Find By Name """
+        bad_request_mock.side_effect = ValidationError()
+        resp = self.app.get('/products', query_string='name=Rome Chair')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch('app.productservice.Product.find_by_name')
+    def test_mock_search_data(self, pet_find_mock):
+        """ Test showing how to mock data """
+        pet_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'Rome Chair'})]
+        resp = self.app.get('/products', query_string='name=fido')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
 
 
 ######################################################################
