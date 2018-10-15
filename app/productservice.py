@@ -61,19 +61,32 @@ def index():
 @app.route('/products', methods=['GET'])
 def list_products():
      """ Return all the products"""
-     flowers = []
+     products = []
      name = request.args.get('name')
      app.logger.info(name)
      category = request.args.get('category')
      if name:
-         flowers = Product.find_by_name(name)
+         products = Product.find_by_name(name)
      elif category:
-         flowers = Product.find_by_category(category)
+         products = Product.find_by_category(category)
      else:
-         flowers = Product.all()
+         products = Product.all()
 
-     results = [flower.serialize() for flower in flowers]
+     results = [product.serialize() for product in products]
      return make_response(jsonify(results), status.HTTP_200_OK)
+
+
+#########################
+# Sort products by date
+#########################
+@app.route('/products/latest', methods=['GET'])
+def sort_by_date():
+    """List all the product by their updated date"""
+    app.logger.info("List products by updated date")
+    sorted_products = Product.sort_by_date()
+    results = [ product.serialize() for product in sorted_products]
+    return make_response(jsonify(results), status.HTTP_200_OK)
+
 
 #########################
 # create a product

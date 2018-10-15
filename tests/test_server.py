@@ -1,4 +1,4 @@
-# Copyright 2016, 2017 John J. Rofrano. All Rights Reserved.
+#Copyright 2016, 2017 John J. Rofrano. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,6 +77,19 @@ class TestProductServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         data = json.loads(resp.data)
         self.assertEqual(len(data), 2)
+
+    def test_get_product_list_by_date(self):
+        """ Get a list of Products by date order"""
+        products = Product.sort_by_date()
+        results = [ product.serialize() for product in products]
+        resp = self.app.get('/products/latest')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        data = json.loads(resp.data)
+        # print(data)
+        # print(products)
+        # print(results)
+        self.assertEqual(data, results)
+
 
     def test_get_product(self):
         """ Get a single Product """

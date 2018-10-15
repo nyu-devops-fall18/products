@@ -125,3 +125,9 @@ class Product(db.Model):
     def find_by_id(product_id):
         Product.logger.info("Finding a product")
         return Product.query.get(product_id)
+
+    @staticmethod
+    def sort_by_date():
+        Product.logger.info("Return all products by updated date")
+        # Product.logger.info(Product.query.order_by(Product.updateddate.desc()))
+        return Product.query.order_by(Product.updateddate.desc())
