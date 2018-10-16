@@ -49,11 +49,23 @@ def internal_server_error(error):
     app.logger.info(message)
     return jsonify(status=500, error='Internal Server Error', message=message), 500
 
+#########################
+# Index Page
+#########################
 @app.route("/")
 def index():
     app.logger.info(Product.query.all())
     return jsonify(name="Product Demo REST API Service",
-                   version='1.0', path=url_for("pricerange")), status.HTTP_200_OK
+                   version='1.0', Get_All_Products="[GET] /products",
+                   Get_Latest_Products="[GET] /products/latest",
+                   Get_Product_By_ID="[GET] /products?id=<item_id>",
+                   Get_Product_By_Category="[GET] /products?category=<category>",
+                   Get_Product_By_Name="[GET] /products?name=<name>",
+                   Get_Product_By_PriceRange="[GET] /products/pricerange?minimum=<min-price>&maximum=<max_price>",
+                   Create_Product="[POST] /products/",
+                   Update_Product="[PUT] /products/<item_id>",
+                   Delete_Product="[DELETE] /products/<item_id>"
+                   ), status.HTTP_200_OK
 
 #########################
 # list all products
