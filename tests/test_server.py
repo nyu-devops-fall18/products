@@ -143,10 +143,22 @@ class TestProductServer(unittest.TestCase):
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['category'], 'Fancy Table')
 
+    def test_update_product_rating(self):
+        """ Update an existing Product Rating """
+        product = Product.find_by_name('Athens Table')[0]
+        new_product = dict(id=1,name='Athens Table', description='Stupid Table', category="Fancy Table",price=20, condition="Boxed", inventory=2, review="", rating=8)
+        data = json.dumps(new_product)
+        resp = self.app.put('/products/{}'.format(product.id),
+                            data=data,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        new_json = json.loads(resp.data)
+        self.assertEqual(new_json['rating'], 6)
+
     def test_delete_product(self):
         """ Delete a Product """
         product = Product.find_by_name('Athens Table')[0]
-        # save the current number of products for later comparrison
+        # save the current number of products for later comparison
         product_count = self.get_product_count()
         resp = self.app.delete('/products/{}'.format(product.id),
                                content_type='application/json')
