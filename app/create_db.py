@@ -1,4 +1,4 @@
-from app.productmodel import Product
+from app.model import Product
 from datetime import datetime
 
 def dbcreate():
