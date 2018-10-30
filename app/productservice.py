@@ -182,7 +182,7 @@ def deleteproduct(item_id):
     app.logger.info("Deleting the product for the id provided")
     product = Product.find_by_id(item_id)
     if not product:
-        raise NotFound("Product with id {} not found".format(item_id))
+        return make_response(" ", status.HTTP_204_NO_CONTENT)
     product.delete()
     return make_response(" ", status.HTTP_204_NO_CONTENT)
 
