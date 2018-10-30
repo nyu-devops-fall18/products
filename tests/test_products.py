@@ -22,7 +22,7 @@ Test cases can be run with:
 
 import unittest
 import os
-from app.productmodel import Product, ValidationError, db
+from app.model import Product, ValidationError, db
 from app import app
 
 DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')

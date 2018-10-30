@@ -4,7 +4,7 @@ import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
-from app.productmodel import Product, ValidationError
+from app.model import Product, ValidationError
 
 #########################
 # error handlers

@@ -28,8 +28,8 @@ import logging
 from flask_api import status    # HTTP Status Codes
 from mock import MagicMock, patch
 
-from app.productmodel import Product, ValidationError, db
-import app.productservice as service
+from app.model import Product, ValidationError, db
+import app.service as service
 
 DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
 
