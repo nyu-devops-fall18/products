@@ -183,14 +183,14 @@ class TestProductServer(unittest.TestCase):
         resp = self.app.put('/products')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @patch('app.productservice.Product.find_by_name')
+    @patch('app.service.Product.find_by_name')
     def test_bad_request(self, bad_request_mock):
         """ Test a Bad Request error from Find By Name """
         bad_request_mock.side_effect = ValidationError()
         resp = self.app.get('/products', query_string='name=Rome Chair')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
-    @patch('app.productservice.Product.find_by_name')
+    @patch('app.service.Product.find_by_name')
     def test_mock_search_data(self, product_find_mock):
         """ Test showing how to mock data """
         product_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'Rome Chair'})]
