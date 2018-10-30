@@ -148,7 +148,7 @@ class TestProductServer(unittest.TestCase):
         product = Product.find_by_name('Athens Table')[0]
         new_product = dict(id=1,name='Athens Table', description='Stupid Table', category="Fancy Table",price=20, condition="Boxed", inventory=2, review="", rating=8)
         data = json.dumps(new_product)
-        resp = self.app.put('/products/{}'.format(product.id),
+        resp = self.app.put('/products/rating/{}'.format(product.id),
                             data=data,
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)

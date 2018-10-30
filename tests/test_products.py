@@ -95,7 +95,7 @@ class TestProducts(unittest.TestCase):
         self.assertEqual(products[0].category, "Home")
 
     def test_update_a_product_rating(self):
-        """ Update a Product """
+        """ Update a Product Rating"""
         product = Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8)
         product.save()
         self.assertEqual(product.id, 1)
