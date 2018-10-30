@@ -64,6 +64,7 @@ def index():
                    Get_Product_By_PriceRange="[GET] /products/pricerange?minimum=<min-price>&maximum=<max_price>",
                    Create_Product="[POST] /products/",
                    Update_Product="[PUT] /products/<item_id>",
+                   Update_Product_Rating="[PUT] /products/rating/<item_id>",
                    Delete_Product="[DELETE] /products/<item_id>"
                    ), status.HTTP_200_OK
 
