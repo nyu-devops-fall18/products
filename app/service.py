@@ -64,7 +64,7 @@ def index():
                    Get_Product_By_PriceRange="[GET] /products/pricerange?minimum=<min-price>&maximum=<max_price>",
                    Create_Product="[POST] /products/",
                    Update_Product="[PUT] /products/<item_id>",
-                   Update_Product_Rating="[PUT] /products/rating/<item_id>",
+                   Update_Product_Rating="[PUT] /products/rating/<item_id>?stars=<rating from [1,10]>",
                    Delete_Product="[DELETE] /products/<item_id>"
                    ), status.HTTP_200_OK
 
@@ -184,13 +184,15 @@ def update_product_rating(item_id):
     check_content_type("application/json")
     product = Product.find_by_id(item_id)
     hitcount = product.updateCount
+    newrating = request.args.get('stars')
+    print(newrating)
     if not product:
         raise NotFound("Product with id {} not found".format(item_id))
     # app.logger.info(product.deserialize(request.get_json()))
-    product.deserialize(request.get_json())
-    product.id = item_id
+    # product.deserialize(request.get_json())
+    # product.id = item_id
     # app.logger.info(product.rating)
-    product.rating = product.totalrating/(hitcount+1)
+    product.rating = (int(product.totalrating) + int(newrating))/(hitcount+1)
     product.update()
     return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
 
