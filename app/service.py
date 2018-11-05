@@ -163,10 +163,10 @@ def update_product(item_id):
     product = Product.find_by_id(item_id)
     # app.logger.info(product.rating)
     # prevrating = product.rating
-    hitcount = product.updateCount
     if not product:
         raise NotFound("Product with id {} not found".format(item_id))
     # app.logger.info(product.deserialize(request.get_json()))
+    hitcount = product.updateCount
     product.deserialize(request.get_json())
     product.id = item_id
     # app.logger.info(product.rating)

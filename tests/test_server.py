@@ -27,7 +27,6 @@ import json
 import logging
 from flask_api import status    # HTTP Status Codes
 from mock import MagicMock, patch
-
 from app.model import Product, ValidationError, db
 import app.service as service
 
@@ -105,6 +104,11 @@ class TestProductServer(unittest.TestCase):
         """ Get a Product thats not found """
         resp = self.app.get('/products/0')
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_product_not_found_delete(self):
+        """ Get a Product thats not found in Delete Request """
+        resp = self.app.delete('/products/0')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_create_product(self):
         """ Create a new Product """
@@ -189,6 +193,18 @@ class TestProductServer(unittest.TestCase):
         bad_request_mock.side_effect = ValidationError()
         resp = self.app.get('/products', query_string='name=Rome Chair')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    @patch('app.service.Product.update')
+    def test_bad_request_header(self, invalid_header_mock):
+        """ Test a Bad Request error from Update"""
+        resp = self.app.put('/products/1', headers={'Content-Type': 'xml'})
+        self.assertEqual(resp.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+
+    @patch('app.service.Product.update')
+    def test_bad_request_product_404(self, bad_request_mock):
+        """ Test a Bad Request error from Update due to invalid product"""
+        resp = self.app.put('/products/0', headers={'Content-Type': 'application/json'})
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
 
     @patch('app.service.Product.find_by_name')
     def test_mock_search_data(self, product_find_mock):
