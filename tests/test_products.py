@@ -94,6 +94,21 @@ class TestProducts(unittest.TestCase):
         self.assertEqual(len(products), 1)
         self.assertEqual(products[0].category, "Home")
 
+    def test_update_a_product_rating(self):
+        """ Update a Product Rating"""
+        product = Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8)
+        product.save()
+        self.assertEqual(product.id, 1)
+        # Change it and save it
+        product.rating = 10
+        product.update()
+        self.assertEqual(product.id, 1)
+        # Fetch it back and make sure the id hasn't changed
+        # but the data did change
+        products = Product.all()
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].rating, 10)
+
     def test_delete_a_product(self):
         """ Delete a Product """
         product = Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8)
