@@ -224,7 +224,13 @@ class TestProductServer(unittest.TestCase):
         product_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'Rome Chair'})]
         resp = self.app.get('/products', query_string='name=Rome Chair')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-
+    
+    @patch('app.service.Product.find_by_name')
+    def test_search_bad_data(self, product_find_mock):
+        """ Test a bad search that returns bad data """
+        product_find_mock.return_value = None
+        resp = self.app.get('/products', query_string='name=Rome Chair')
+        self.assertEqual(resp.status_code,status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 ######################################################################
 # Utility functions
