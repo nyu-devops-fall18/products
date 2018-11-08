@@ -1,5 +1,6 @@
 import os
-from app import app, service, create_db
+from app import app, service
+import create_db
 
 # Pull options from environment
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
