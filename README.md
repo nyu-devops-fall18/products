@@ -11,6 +11,7 @@ The products resource represents the store items that the customer can perform t
 * List products by name
 * List products by price range
 * Give product a rating
+* Give product a review
 
 On the other hand, developers can:
 * Create a new product
