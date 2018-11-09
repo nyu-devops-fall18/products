@@ -11,14 +11,11 @@ The products resource represents the store items that the customer can perform t
 * List products by name
 * List products by price range
 * Give product a rating
-* Give product a review comment
 
 On the other hand, developers can:
 * Create a new product
 * Update a product
 * Delete a product
-Each product should have a unique id (perhaps a SKU - Stock Keeping Unit), a name, description, price and others attributes like perhaps an image, ratings and reviews.
-
 
 # How to run the service
 Please run the following commands:
