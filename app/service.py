@@ -196,6 +196,25 @@ def update_product_rating(item_id):
     product.update()
     return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
 
+#############################
+# update product review by ID
+#############################
+@app.route("/products/review/<int:item_id>", methods=["PUT"])
+def update_product_review(item_id):
+    app.logger.info("Fetching the product")
+    check_content_type("application/json")
+    product = Product.find_by_id(item_id)
+    newreview = request.args.get('newrev')
+    print(newreview)
+    if not product:
+        raise NotFound("Product with id {} not found".format(item_id))
+    if not product.review:
+         product.review = str(newreview)
+    else:
+        product.review = str(product.review) + "|" + str(newreview)
+    product.update()
+    return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
+
 #########################
 # delete product by ID
 #########################
