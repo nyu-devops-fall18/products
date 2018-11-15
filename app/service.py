@@ -55,19 +55,19 @@ def internal_server_error(error):
 @app.route("/")
 def index():
     app.logger.info(Product.query.all())
-    return jsonify(name="Product Demo REST API Service",
-                   version='1.0', Get_All_Products="[GET] /products",
-                   Get_Latest_Products="[GET] /products/latest",
-                   Get_Product_By_ID="[GET] /products?id=<item_id>",
-                   Get_Product_By_Category="[GET] /products?category=<category>",
-                   Get_Product_By_Name="[GET] /products?name=<name>",
-                   Get_Product_By_PriceRange="[GET] /products/pricerange?minimum=<min-price>&maximum=<max_price>",
-                   Create_Product="[POST] /products/",
-                   Update_Product="[PUT] /products/<item_id>",
-                   Update_Product_Rating="[PUT] /products/rating/<item_id>?stars=<rating from [1,10]>",
-                   Delete_Product="[DELETE] /products/<item_id>"
-                   ), status.HTTP_200_OK
-
+    # return jsonify(name="Product Demo REST API Service",
+    #                version='1.0', Get_All_Products="[GET] /products",
+    #                Get_Latest_Products="[GET] /products/latest",
+    #                Get_Product_By_ID="[GET] /products?id=<item_id>",
+    #                Get_Product_By_Category="[GET] /products?category=<category>",
+    #                Get_Product_By_Name="[GET] /products?name=<name>",
+    #                Get_Product_By_PriceRange="[GET] /products/pricerange?minimum=<min-price>&maximum=<max_price>",
+    #                Create_Product="[POST] /products/",
+    #                Update_Product="[PUT] /products/<item_id>",
+    #                Update_Product_Rating="[PUT] /products/rating/<item_id>?stars=<rating from [1,10]>",
+    #                Delete_Product="[DELETE] /products/<item_id>"
+    #                ), status.HTTP_200_OK
+    return app.send_static_file('index.html')
 #########################
 # list all products
 #########################
@@ -225,6 +225,15 @@ def deleteproduct(item_id):
     if not product:
         return make_response("Product does not exist", status.HTTP_204_NO_CONTENT)
     product.delete()
+    return make_response(" ", status.HTTP_204_NO_CONTENT)
+
+#########################
+# delete all products
+#########################
+@app.route("/products", methods=["DELETE"])
+def deleteallproducts():
+    app.logger.info("Deleting all products")
+    Product.delete_all()
     return make_response(" ", status.HTTP_204_NO_CONTENT)
 
 def check_content_type(content_type):
