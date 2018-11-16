@@ -86,7 +86,7 @@ class Product(db.Model):
             self.review = productdata['review']
             self.rating = productdata['rating']
             self.updateddate = str(datetime.now())
-            self.totalrating += productdata['rating']
+            self.totalrating += int(productdata['rating'])
         except KeyError as err:
             raise ValidationError('Invalid product: missing ' + err.args[0])
         return self
@@ -107,9 +107,16 @@ class Product(db.Model):
         return Product.query.filter((Product.price.between(minimum,maximum)))
 
     @staticmethod
+    def delete_all():
+        Product.logger.info("Deleting all products")
+        db.session.query(Product).delete()
+        db.session.commit()
+
+    @staticmethod
     def all():
         """ Returns all of the products in the database """
         Product.logger.info('Processing all Products')
+        # print(Product.query.all())
         return Product.query.all()
 
     @staticmethod

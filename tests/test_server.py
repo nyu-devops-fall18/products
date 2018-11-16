@@ -188,6 +188,17 @@ class TestProductServer(unittest.TestCase):
         new_count = self.get_product_count()
         self.assertEqual(new_count, product_count - 1)
 
+    def test_delete_all_products(self):
+        """ Delete all Products """
+        # save the current number of products for later comparison
+        # product_count = self.get_product_count()
+        resp = self.app.delete('/products',
+                               content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(len(resp.data), 0)
+        # new_count = self.get_product_count()
+        # self.assertEqual(new_count, 0)
+
     def test_query_product_list_by_category(self):
         """ Query Products by Category """
         resp = self.app.get('/products',

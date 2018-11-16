@@ -65,9 +65,11 @@ def index():
                    Create_Product="[POST] /products/",
                    Update_Product="[PUT] /products/<item_id>",
                    Update_Product_Rating="[PUT] /products/rating/<item_id>?stars=<rating from [1,10]>",
-                   Delete_Product="[DELETE] /products/<item_id>"
+                   Delete_Product="[DELETE] /products/<item_id>",
+                   Delete_All_Products="[DELETE] /products"
                    ), status.HTTP_200_OK
-
+    #Please comment above return statement and uncommment the below return statement FOR BEHAVIORAL TESTING
+    # return app.send_static_file('index.html')
 #########################
 # list all products
 #########################
@@ -225,6 +227,15 @@ def deleteproduct(item_id):
     if not product:
         return make_response("Product does not exist", status.HTTP_204_NO_CONTENT)
     product.delete()
+    return make_response(" ", status.HTTP_204_NO_CONTENT)
+
+#########################
+# delete all products
+#########################
+@app.route("/products", methods=["DELETE"])
+def deleteallproducts():
+    app.logger.info("Deleting all products")
+    Product.delete_all()
     return make_response(" ", status.HTTP_204_NO_CONTENT)
 
 def check_content_type(content_type):
