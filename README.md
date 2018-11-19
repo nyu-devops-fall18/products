@@ -33,7 +33,7 @@ e.g.2 to sort all the products by date, please try link: http://localhost:5000/p
 e.g.3 to search a product by name, please try link: http://localhost:5000/products?name=desk <br>
 e.g.4 to search a product by category, please try link: http://localhost:5000/products?category=clothing <br>
 
-# Run Unit Tests
+# Running TDD Unit Tests
 Perform the same steps as above, till cd /vagrant and then run the following command:
 ```
 nosetests
