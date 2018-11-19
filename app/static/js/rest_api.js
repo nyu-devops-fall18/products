@@ -126,6 +126,38 @@ $(function () {
 
     });
 
+//    // ****************************************
+//    // Rate a Product
+//    // ****************************************
+//
+//    $("#rate-btn").click(function () {
+//
+//        var product_id = $("#product_id").val();
+//
+//
+//        queryString = " "
+//
+//        if(rating):
+//            queryString = "?stars=" + rating
+//
+//        var ajax = $.ajax({
+//                type: "PUT",
+//                url: "/products/" + product_id + "/rating" + queryString,
+//                contentType:"application/json",
+//                data: JSON.stringify(data)
+//            })
+//
+//        ajax.done(function(res){
+//            update_form_data(res)
+//            flash_message("Product with ID " + product_id + " has been rated successfully")
+//        });
+//
+//        ajax.fail(function(res){
+//            flash_message(res.responseJSON.message)
+//        });
+//
+//    });
+
     // ****************************************
     // Retrieve a Product
     // ****************************************
@@ -136,7 +168,7 @@ $(function () {
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/products/" + product_id,
+            url: "/products/" + "1",
             contentType:"application/json",
             data: ''
         })
@@ -171,7 +203,8 @@ $(function () {
 
         ajax.done(function(res){
             clear_form_data()
-            flash_message("Product with ID [" + res.id + "] has been Deleted!")
+//            flash_message("Product with ID [" + product_id + "] has been Deleted!")
+            flash_message("Success")
         });
 
         ajax.fail(function(res){
