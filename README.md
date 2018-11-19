@@ -20,7 +20,7 @@ On the other hand, developers can:
 
 # How to run the service
 Please run the following commands:
-```
+```shell
 git clone https://github.com/nyu-devops-fall18/products.git  
 cd products     
 vagrant up
@@ -35,18 +35,18 @@ e.g.4 to search a product by category, please try link: http://localhost:5000/pr
 
 # Running TDD Unit Tests
 Perform the same steps as above, till cd /vagrant and then run the following command:
-```
+```shell
 nosetests
 ```
 
 # Running BDD Integration Tests
 Perform the same steps as above, till cd /vagrant and then run the following:
-```
+```shell
 honcho start &
 behave
 ```
 To stop the app, do the following:
-```
+```shell
 fg
 <ctrl + c>
 ```
