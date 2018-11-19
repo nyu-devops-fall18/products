@@ -26,7 +26,7 @@ cd products
 vagrant up
 vagrant ssh
 cd /vagrant
-python run.py   
+honcho start   
 ```
 e.g.1 to list all the products, please try link: http://localhost:5000/products <br>
 e.g.2 to sort all the products by date, please try link: http://localhost:5000/products/latest <br>
@@ -37,4 +37,16 @@ e.g.4 to search a product by category, please try link: http://localhost:5000/pr
 Perform the same steps as above, till cd /vagrant and then run the following command:
 ```
 nosetests
+```
+
+# Running BDD Integration Tests
+Perform the same steps as above, till cd /vagrant and then run the following:
+```
+honcho start &
+behave
+```
+To stop the app, do the following:
+```
+fg
+<ctrl + c>
 ```
