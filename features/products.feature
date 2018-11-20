@@ -56,22 +56,21 @@ Scenario: Update a Product
 	Then I should see "Italian Table" in the results
 	Then I should not see "Athens Table" in the results
 
-#  Scenario: Add a Rating to a product
+Scenario: Delete a Product
+    When I visit the "Home Page"
+    And I set the "Id" to "2"
+    And I press the "Delete" button
+    Then I should see the message "Success"
+    When I press the "Clear" button
+    And I press the "Search" button
+    Then I should not see "Rome Chair" in the results
+
+#Scenario: Add a Rating to a product
 #    When I visit the "Home Page"
 #    And I set the "Id" to "1"
 #    And I set the "Rating" to "8"
-#    And I press the "Rate" button
-#    Then I should see the message "Product with ID 1 has been rated successfully"
-#    When I press the "Clear" button
-#    And I press the "Search" button
-#    Then I should not see "10" in the results
-#
-
-Scenario: Delete a Product
-  When I visit the "Home Page"
-  And I set the "Id" to "2"
-  And I press the "Delete" button
-  Then I should see the message "Success"
-  When I press the "Clear" button
-  And I press the "Search" button
-  Then I should not see "Rome Chair" in the results
+#    And I press the "Rating" button
+#    Then I should see the message "Success"       
+#    When I set the "Id" to 1
+#    And I press the "Retrieve" button
+#    Then I should see "9" in the "Rating" field

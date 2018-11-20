@@ -5,6 +5,7 @@ Thumbs.db
 # database files
 db/*
 !db/.keep
+db/test.db
 
 #VSCode files
 .vscode/*
