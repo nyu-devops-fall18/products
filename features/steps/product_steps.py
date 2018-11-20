@@ -13,8 +13,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
 BASE_URL = getenv('BASE_URL', 'http://127.0.0.1:5000/')
-WAIT_SECONDS = 10
-count = 0
+WAIT_SECONDS = 20
+# count = 0
 
 @given('the following products')
 def step_impl(context):
@@ -78,6 +78,10 @@ def step_impl(context):
 @when('I set the "Rating" to 8')
 def step_impl(context):
     raise NotImplementedError(u'STEP: When I set the "Rating" to 8')
+
+@when(u'I set the "Id" to 1')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: When I set the "Id" to 1')
 
 ##################################################################
 # This code works because of the following naming convention:
