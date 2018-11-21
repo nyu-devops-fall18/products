@@ -7,7 +7,7 @@ from selenium import webdriver
 from app import service
 
 WAIT_SECONDS = 20
-BASE_URL = os.getenv('BASE_URL', 'http://127.0.0.1:5000')
+BASE_URL = os.getenv('BASE_URL', 'https://nyu-product-service-f18.mybluemix.net')
 
 def before_all(context):
     """ Executed once before all tests """
