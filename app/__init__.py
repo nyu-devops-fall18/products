@@ -4,7 +4,7 @@ from flask import Flask
 # Create Flask application
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://nioqedkc:L_hHgWLL5NXt1I7PzgG4Dddro37nXNAt@baasu.db.elephantsql.com:5432/nioqedkc'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../db/products.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = 'Shhhh'
 app.config['LOGGING_LEVEL'] = logging.INFO
