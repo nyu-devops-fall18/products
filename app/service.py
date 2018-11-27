@@ -84,6 +84,8 @@ def list_products():
          products = Product.find_by_name(name)
      elif category:
          products = Product.find_by_category(category)
+     elif id:
+         products = Product.find_by_id(id)
      else:
          products = Product.all()
 
