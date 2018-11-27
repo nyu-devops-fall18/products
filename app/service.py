@@ -80,7 +80,6 @@ def list_products():
      name = request.args.get('name')
      app.logger.info(name)
      category = request.args.get('category')
-     id = request.args.get("id")
      if name:
          products = Product.find_by_name(name)
      elif category:
