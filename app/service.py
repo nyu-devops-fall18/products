@@ -180,21 +180,23 @@ def update_product(item_id):
 #############################
 # update product rating by ID
 #############################
-@app.route("/products/rating/<int:item_id>", methods=["PUT"])
-def update_product_rating(item_id):
+@app.route("/products/rating", methods=["PUT"])
+def update_product_rating():
     app.logger.info("Fetching the product")
-    check_content_type("application/json")
-    product = Product.find_by_id(item_id)
-    hitcount = product.updateCount
+    item = request.args.get("id")
+    # check_content_type("application/json")
+    product = Product.find_by_id(item)
     newrating = request.args.get('stars')
     print(newrating)
     if not product:
-        raise NotFound("Product with id {} not found".format(item_id))
+        raise NotFound("Product with id {} not found".format(item))
     # app.logger.info(product.deserialize(request.get_json()))
     # product.deserialize(request.get_json())
     # product.id = item_id
     # app.logger.info(product.rating)
-    product.rating = (int(product.totalrating) + int(newrating))/(hitcount+1)
+    product.totalrating += int(newrating)
+    # product.updateCount += 1
+    product.rating = (int(product.totalrating)/(product.updateCount + 1))
     product.update()
     return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
 
