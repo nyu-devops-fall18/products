@@ -109,17 +109,14 @@ class ProductCollection(Resource):
     #
 
 @api.route('/products/rating/<int:id1>/<int:star1>')
-@api.param('id1', 'The Pet identifier')
-@api.param('star1', 'The Pet identifier')
+@api.param('id1', 'The Product id ')
+@api.param('star1', 'The Product rating')
 # @api.doc(params={'stars':'product rating'})
 class ProductCollection(Resource):
     # @api.expect(product_arguments1, validate=True)
     def put(self, id1,star1):
         # print(product_arguments1)
         # p_id = int((product_arguments1.parse_args())['id'])
-        # p_stars = int ((product_arguments1.parse_args())['stars'])
-        print (id1)
-        print (star1)
         product1 = []
         for p in products:
             pid = int(p['id'])
@@ -131,8 +128,22 @@ class ProductCollection(Resource):
         hit= int(product1['hitCount'])
         hit+=1
         product1['hitCount']=hit
-        print (int (product1['hitCount']))
         product1['rating']= int (rating1 + star1)/ int(product1['hitCount'])
+        return product1,201
+
+@api.route('/products/review/<int:id1>/<string:review1>')
+@api.param('id1', 'The Product id ')
+@api.param('review1', 'The Product review')
+class ProductCollection(Resource):
+    def put(self, id1,review1):
+        product1 = []
+        for p in products:
+            pid = int(p['id'])
+            if (pid == id1):
+                product1 = p
+                break
+        reviews = str(product1['review'])
+        product1['review'] = reviews + "|" + str (review1)
         return product1,201
 
 
