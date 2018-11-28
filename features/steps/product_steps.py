@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
 BASE_URL = getenv('BASE_URL', 'http://nyu-product-service-f18.mybluemix.net')
-WAIT_SECONDS = 20
+WAIT_SECONDS = 40
 # count = 0
 
 @given('the following products')

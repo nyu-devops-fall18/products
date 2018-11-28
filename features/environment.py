@@ -6,7 +6,7 @@ from behave import *
 from selenium import webdriver
 from app import service
 
-WAIT_SECONDS = 20
+WAIT_SECONDS = 40
 BASE_URL = os.getenv('BASE_URL', 'http://nyu-product-service-f18.mybluemix.net')
 
 def before_all(context):
