@@ -162,15 +162,15 @@ class TestProductServer(unittest.TestCase):
     def test_update_product_review(self):
         """ Update an existing Product Review """
         product = Product.find_by_name('Athens Table')[0]
-        resp = self.app.put('/products/review/{}'.format(product.id),
-                            query_string='newrev=Average',
+        resp = self.app.put('/products/review',
+                            query_string='id=1&newrev=Average',
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['review'], 'Average')
         product = Product.find_by_name('Athens Table')[0]
-        resp = self.app.put('/products/review/{}'.format(product.id),
-                            query_string='newrev=Awesome',
+        resp = self.app.put('/products/review',
+                            query_string='id=1&newrev=Awesome',
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
@@ -252,7 +252,7 @@ class TestProductServer(unittest.TestCase):
         product_find_mock.return_value = [MagicMock(serialize=lambda: {'name': 'Rome Chair'})]
         resp = self.app.get('/products', query_string='name=Rome Chair')
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
-    
+
     @patch('app.service.Product.find_by_name')
     def test_search_bad_data(self, product_find_mock):
         """ Test a bad search that returns bad data """
