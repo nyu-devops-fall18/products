@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_restplus import Api, Resource, fields, reqparse
+from flask_restplus import Api, Resource, fields, reqparse, abort
 # from app.model import Product
 
 app = Flask(__name__)
@@ -19,7 +19,7 @@ product_model = api.model('Product', {'id': fields.Integer(required=True, descri
 
 products = []
 product1 = {'id': 1, 'name': 'Desk', 'description': 'wooden study desk', 'category': 'Furniture', 'price': '50', 'condition': 'Boxed', 'inventory': '500', 'review': 'Great product', 'rating': '8','hitCount':'1'}
-product2 = {'id': 2, 'name': 'Chair', 'description': 'mesh office chair', 'category': 'Furniture', 'price': '30', 'condition': 'Boxed', 'inventory': '1500', 'review': '', 'rating': '9','hitCount':'1'}
+product2 = {'id': 2, 'name': 'Chair', 'description': 'mesh office chair', 'category': 'Office', 'price': '30', 'condition': 'Boxed', 'inventory': '1500', 'review': '', 'rating': '9','hitCount':'1'}
 products.append(product1)
 products.append(product2)
 results = []
@@ -28,9 +28,9 @@ product_arguments = reqparse.RequestParser()
 product_arguments.add_argument('minimum', type=int, required=True)
 product_arguments.add_argument('maximum', type=int, required=True)
 
-product_arguments1 = reqparse.RequestParser()
-product_arguments1.add_argument('id', type=int, required=True)
-product_arguments1.add_argument('stars', type=int, required=True, choices=[1,2,3,4,5,6,7,8,9,10])
+#product_arguments1 = reqparse.RequestParser()
+#product_arguments1.add_argument('name', type=str, required=True)
+#product_arguments1.add_argument('stars', type=int, required=True, choices=[1,2,3,4,5,6,7,8,9,10])
 
 
 @api.route('/products')
@@ -53,36 +53,58 @@ class ProductCollection(Resource):
 	    return [], 204
 
 
-@api.route('/products/<id>')
-@api.doc(params={'id':'product id'})
+@api.route('/products/id/<int:id>')
+@api.param('id','product id')
 class ProductCollection(Resource):
-    def get(self, id):
-        global results
-        results2 = []
-        for p in products:
-            paramid = int(id)
-            pid = int(p['id'])
-            if(pid == paramid):
-                print("Yayy")
-                print((id))
-                results2.append(p)
-        return results2, 200
+   def get(self, id):
+       global results
+       results2 = []
+       for p in products:
+           paramid = int(id)
+           pid = int(p['id'])
+           if(pid == paramid):
+               print("OK")
+               print((id))
+               results2.append(p)
+       return results2, 200
 
 
-    # @api.route('/products', methods=['GET'])
-    # @api.doc(params={'name':'product name', 'category':'product category'})
-    # class ProductCollection(Resource):
-    #     def get(self, name):
-    #         return api.output(), 200
-    #
-    #
-    # @api.route('/products', methods=['GET'])
-    # @api.doc(params={'category':'product category'})
-    # class ProductCollection(Resource):
-    #     def get(self, category):
-    #         return api.output(), 200
-    #
-    #
+@api.route('/products/name/<string:name>', methods=['GET'])
+@api.param('name','product name')
+class ProductCollection(Resource):
+   def get(self, name):
+      global results
+      results3 = []
+      print("hello!")
+      for p in products:
+           pname = str(p['name'])
+           print(pname)
+           if(pname == name):
+              print("OK")
+              print((name))
+              results3.append(p)
+              break
+      return results3, 200
+
+
+@api.route('/products/category/<string:category>', methods=['GET'])
+@api.param('category','product category')
+class ProductCollection(Resource):
+   def get(self, category):
+      global results
+      results4 = []
+      print("hello!")
+      for p in products:
+           pcate = str(p['category'])
+           print(pcate)
+           if(pcate == category):
+              print("OK")
+              print((category))
+              results4.append(p)
+              break
+      return results4, 200
+    
+    
 @api.route('/products/pricerange', methods=['GET'])
 class ProductCollection(Resource):
     @api.expect(product_arguments, validate=True)
@@ -99,10 +121,10 @@ class ProductCollection(Resource):
             print(price1)
             print(max)
             if (price1 >= min):
-                print ("yay1")
+                print ("OK")
                 if (price1 <= max):
                     results1.append(p)
-                    print("Yayy")
+                    print("OK as well")
                 print(results1)
         return results1, 200
     #
