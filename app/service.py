@@ -206,9 +206,10 @@ def update_product_rating():
 #############################
 # update product review by ID
 #############################
-@app.route("/products/review/<int:item_id>", methods=["PUT"])
-def update_product_review(item_id):
+@app.route("/products/review", methods=["PUT"])
+def update_product_review():
     app.logger.info("Fetching the product")
+    item_id = request.args.get("id")
     check_content_type("application/json")
     product = Product.find_by_id(item_id)
     newreview = request.args.get('newrev')
