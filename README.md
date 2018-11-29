@@ -3,7 +3,7 @@
 [![codecov](https://codecov.io/gh/nyu-devops-fall18/products/branch/master/graph/badge.svg)](https://codecov.io/gh/nyu-devops-fall18/products)
 
 # Service Description
-The products resource represents the store items that the customer can perform the following operations: 
+The products resource represents the store items that the customer can perform the following operations:
 * List All products
 * List products by ID
 * List products by date (i.e. sort by date)
@@ -48,5 +48,7 @@ behave
 To stop the app, do the following:
 ```shell
 fg
+
+
 <ctrl + c>
 ```
