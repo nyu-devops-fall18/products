@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/nyu-devops-fall18/products.svg?branch=master)](https://travis-ci.org/nyu-devops-fall18/products)
 [![codecov](https://codecov.io/gh/nyu-devops-fall18/products/branch/master/graph/badge.svg)](https://codecov.io/gh/nyu-devops-fall18/products)
 
-# Service Description
+# Service Description 
 The products resource represents the store items that the customer can perform the following operations:
 * List All products
 * List products by ID
