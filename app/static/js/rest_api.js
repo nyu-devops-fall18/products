@@ -1,4 +1,4 @@
-$(function () {
+$(function() {
 
     // ****************************************
     //  U T I L I T Y   F U N C T I O N S
@@ -37,37 +37,42 @@ $(function () {
     }
 
 
-//    // ****************************************
-//    // Rate a Product
-//    // ****************************************
-//
-//    $("#rating-btn").click(function () {
-//
-//        var product_id = $("#product_id").val();
-//        var newrating = $("#product_rating").val();
-//
-//        query = ""
-//
-//        if(rating):
-//            query += "stars=" + newrating
-//
-//        var ajax = $.ajax({
-//                type: "PUT",
-//                url: "/products/rating/" + product_id + "?" + query,
-//                contentType:"application/json",
-//                data: ''
-//            })
-//
-//        ajax.done(function(res){
-//         // update_form_data(res)
-//            flash_message("Success")
-//        });
-//
-//        ajax.fail(function(res){
-//            flash_message(res.responseJSON.message)
-//        });
-//
-//    });
+     //****************************************
+     //Rate a Product
+     //****************************************
+
+    $("#rating-btn").click(function () {
+
+        var product_id = $("#product_id").val();
+        var newrating = $("#product_rating").val();
+        console.log(product_id)
+        console.log(newrating)
+        query = ""
+        if(product_id){
+            query += "id=" + product_id
+            if(newrating){
+                query += "&stars=" + newrating
+            }
+        }
+        console.log(query)
+
+        var ajax = $.ajax({
+                type: "PUT",
+                url: "/products/rating?" + query,
+                contentType:"application/json",
+                data: ''
+            })
+
+        ajax.done(function(res){
+         // update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
 
     // ****************************************
     // Create a Product
@@ -313,3 +318,5 @@ $(function () {
     });
 
 })
+
+

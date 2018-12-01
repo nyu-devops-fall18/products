@@ -65,12 +65,13 @@ Scenario: Delete a Product
     And I press the "Search" button
     Then I should not see "Rome Chair" in the results
 
-#Scenario: Add a Rating to a product
-#    When I visit the "Home Page"
-#    And I set the "Id" to "1"
-#    And I set the "Rating" to "8"
-#    And I press the "Rating" button
-#    Then I should see the message "Success"       
-#    When I set the "Id" to 1
-#    And I press the "Retrieve" button
-#    Then I should see "9" in the "Rating" field
+Scenario: Add a Rating to a product
+    When I visit the "Home Page"
+    And I set the "Id" to "1"
+    And I set the "Rating" to "8"
+    And I press the "Rating" button
+    Then I should see the message "Success"       
+    When I press the "Clear" button
+    And I set the "Id" to "1"
+    And I press the "Retrieve" button
+    Then I should see "9" in the "Rating" field
