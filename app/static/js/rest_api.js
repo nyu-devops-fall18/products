@@ -74,6 +74,44 @@ $(function() {
 
     });
 
+
+    //****************************************
+     //Review a Product
+     //****************************************
+
+    $("#review-btn").click(function () {
+
+        var product_id = $("#product_id").val();
+        var newreview = $("#product_review").val();
+        console.log(product_id)
+        console.log(newreview)
+        query = ""
+        if(product_id){
+            query += "id=" + product_id
+            if(newreview){
+                query += "&newrev=" + newreview
+            }
+        }
+        console.log(query)
+
+        var ajax = $.ajax({
+                type: "PUT",
+                url: "/products/review?" + query,
+                contentType:"application/json",
+                data: ''
+            })
+
+        ajax.done(function(res){
+         // update_form_data(res)
+            flash_message("Success")
+        });
+
+        ajax.fail(function(res){
+            flash_message(res.responseJSON.message)
+        });
+
+    });
+
     // ****************************************
     // Create a Product
     // ****************************************
