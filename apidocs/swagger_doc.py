@@ -1,5 +1,7 @@
 from flask import Flask
 from flask_restplus import Api, Resource, fields, reqparse, abort
+from datetime import datetime
+import json
 # from app.model import Product
 
 app = Flask(__name__)
@@ -14,12 +16,13 @@ product_model = api.model('Product', {'id': fields.Integer(required=True, descri
                               'inventory': fields.Integer(required=True, description='The inventory of the product'),
                               'review': fields.String(required=False, description='The review of the product'),
                               'rating': fields.Integer(required=True, description='The rating of the product'),
-                              'hitCount': fields.Integer(required=True, description='The number of times product has been rated')
+                              'hitCount': fields.Integer(required=True, description='The number of times product has been rated'),
+                              'updatedDate': fields.String(required=False, description="Last updated date of product")
                              })
 
 products = []
-product1 = {'id': 1, 'name': 'Desk', 'description': 'wooden study desk', 'category': 'Furniture', 'price': '50', 'condition': 'Boxed', 'inventory': '500', 'review': 'Great product', 'rating': '8','hitCount':'1'}
-product2 = {'id': 2, 'name': 'Chair', 'description': 'mesh office chair', 'category': 'Office', 'price': '30', 'condition': 'Boxed', 'inventory': '1500', 'review': '', 'rating': '9','hitCount':'1'}
+product1 = {'id': 1, 'name': 'Desk', 'description': 'wooden study desk', 'category': 'Furniture', 'price': '50', 'condition': 'Boxed', 'inventory': '500', 'review': 'Great product', 'rating': '8','hitCount':'1', 'updatedDate': str(datetime.now())}
+product2 = {'id': 2, 'name': 'Chair', 'description': 'mesh office chair', 'category': 'Office', 'price': '30', 'condition': 'Boxed', 'inventory': '1500', 'review': '', 'rating': '9','hitCount':'1', 'updatedDate': str(datetime.now())}
 products.append(product1)
 products.append(product2)
 results = []
@@ -127,8 +130,8 @@ class ProductCollection(Resource):
                     print("OK as well")
                 print(results1)
         return results1, 200
-    #
-    #
+ 
+   
 
 @api.route('/products/rating/<int:id1>/<int:star1>')
 @api.param('id1', 'The Product id ')
@@ -151,6 +154,7 @@ class ProductCollection(Resource):
         hit+=1
         product1['hitCount']=hit
         product1['rating']= int (rating1 + star1)/ int(product1['hitCount'])
+        product1['updatedDate'] = str(datetime.now())
         return product1,201
 
 @api.route('/products/review/<int:id1>/<string:review1>')
@@ -166,16 +170,19 @@ class ProductCollection(Resource):
                 break
         reviews = str(product1['review'])
         product1['review'] = reviews + "|" + str (review1)
+        product1['updatedDate'] = str(datetime.now())
         return product1,201
 
 
-#@api.route('/products/latest')
+@api.route('/products/latest')
 #@api.doc(params={'updateddate':'product update info'})
-#class ProductCOllection(Resource):
-#    def get(self):
-#        sorted_products = Product.sort_by_date()
-	#sorted_products = sorted(products, key='updateddate')
-#	return sorted_products, 200
+class ProductCOllection(Resource):
+    def get(self):
+        data = {}
+        i = 0
+        for p in products:
+            data[p['id']] = p
+        return list(sorted(data.values(), key=lambda item: item['updatedDate'], reverse=True)), 200
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
