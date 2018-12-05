@@ -2,7 +2,6 @@ from flask import Flask
 from flask_restplus import Api, Resource, fields, reqparse, abort
 from datetime import datetime
 import json
-# from app.model import Product
 
 app = Flask(__name__)
 api = Api(app, version='1.0', title='Sample API for NYU-DevOps-Products')
@@ -31,20 +30,72 @@ product_arguments = reqparse.RequestParser()
 product_arguments.add_argument('minimum', type=int, required=True)
 product_arguments.add_argument('maximum', type=int, required=True)
 
-#product_arguments1 = reqparse.RequestParser()
-#product_arguments1.add_argument('name', type=str, required=True)
-#product_arguments1.add_argument('stars', type=int, required=True, choices=[1,2,3,4,5,6,7,8,9,10])
+product_arguments1 = reqparse.RequestParser()
+product_arguments1.add_argument('id', type=int, required=False)
+product_arguments1.add_argument('name', type=str, required=False)
+product_arguments1.add_argument('category', type=str, required = False)
+
+ns = api.namespace("products", description="Products API")
 
 
-@api.route('/products')
+@ns.route('')
 class ProductCollection(Resource):
-    @api.marshal_with(product_model)
+    # @api.marshal_with(product_model)
+    @api.expect(product_arguments1)
     def get(self):
-        return products, 200
+        try:
+            # print("1")
+            id = (product_arguments1.parse_args())['id']
+            name = (product_arguments1.parse_args())['name']
+            cat = (product_arguments1.parse_args())['category']
+            print("1")
+            print(id)
+            print(name)
+            print(cat)
+            resultsprod = []
+            if(id):
+                print("2")
+                for p in products:
+                    paramid = int(id)
+                    pid = int(p['id'])
+                    if (pid == paramid):
+                        print("OK")
+                        print((id))
+                        resultsprod.append(p)
+                        break
+            elif (name):
+                print("3")
+                for p in products:
+                    paramname = str(name)
+                    pname = str(p['name'])
+                    if (pname == paramname):
+                        print("OK")
+                        print((name))
+                        resultsprod.append(p)
+                        break
+            elif (cat):
+                print("4")
+                for p in products:
+                    paramcat = str(cat)
+                    pcat = str(p['category'])
+                    if (pcat == paramcat):
+                        print("OK")
+                        print((cat))
+                        resultsprod.append(p)
+                        break
+            else:
+                print("5")
+                return products, 200
+
+            return resultsprod, 200
+        except Exception as e:
+            # return products, 200
+            print(e)
 
     @api.expect(product_model)
     def put(self):
         return api.payload, 200
+
 
     @api.expect(product_model)
     def post(self):
@@ -55,60 +106,8 @@ class ProductCollection(Resource):
     def delete(self):
 	    return [], 204
 
-
-@api.route('/products/id/<int:id>')
-@api.param('id','product id')
-class ProductCollection(Resource):
-   def get(self, id):
-       global results
-       results2 = []
-       for p in products:
-           paramid = int(id)
-           pid = int(p['id'])
-           if(pid == paramid):
-               print("OK")
-               print((id))
-               results2.append(p)
-       return results2, 200
-
-
-@api.route('/products/name/<string:name>', methods=['GET'])
-@api.param('name','product name')
-class ProductCollection(Resource):
-   def get(self, name):
-      global results
-      results3 = []
-      print("hello!")
-      for p in products:
-           pname = str(p['name'])
-           print(pname)
-           if(pname == name):
-              print("OK")
-              print((name))
-              results3.append(p)
-              break
-      return results3, 200
-
-
-@api.route('/products/category/<string:category>', methods=['GET'])
-@api.param('category','product category')
-class ProductCollection(Resource):
-   def get(self, category):
-      global results
-      results4 = []
-      print("hello!")
-      for p in products:
-           pcate = str(p['category'])
-           print(pcate)
-           if(pcate == category):
-              print("OK")
-              print((category))
-              results4.append(p)
-              break
-      return results4, 200
     
-    
-@api.route('/products/pricerange', methods=['GET'])
+@ns.route('/pricerange', methods=['GET'])
 class ProductCollection(Resource):
     @api.expect(product_arguments, validate=True)
     def get(self):
@@ -130,10 +129,9 @@ class ProductCollection(Resource):
                     print("OK as well")
                 print(results1)
         return results1, 200
- 
-   
 
-@api.route('/products/rating/<int:id1>/<int:star1>')
+
+@ns.route('/rating/<int:id1>/<int:star1>')
 @api.param('id1', 'The Product id ')
 @api.param('star1', 'The Product rating')
 # @api.doc(params={'stars':'product rating'})
@@ -157,7 +155,7 @@ class ProductCollection(Resource):
         product1['updatedDate'] = str(datetime.now())
         return product1,201
 
-@api.route('/products/review/<int:id1>/<string:review1>')
+@ns.route('/review/<int:id1>/<string:review1>')
 @api.param('id1', 'The Product id ')
 @api.param('review1', 'The Product review')
 class ProductCollection(Resource):
@@ -174,15 +172,15 @@ class ProductCollection(Resource):
         return product1,201
 
 
-@api.route('/products/latest')
-#@api.doc(params={'updateddate':'product update info'})
-class ProductCOllection(Resource):
-    def get(self):
-        data = {}
-        i = 0
-        for p in products:
-            data[p['id']] = p
-        return list(sorted(data.values(), key=lambda item: item['updatedDate'], reverse=True)), 200
+@ns.route('/latest')
+class ProductCollection(Resource):
+   def get(self):
+       data = {}
+       i = 0
+       for p in products:
+           data[p['id']] = p
+       return list(sorted(data.values(), key=lambda item: item['updatedDate'], reverse=True)), 200
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
