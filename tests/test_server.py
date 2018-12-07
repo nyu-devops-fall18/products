@@ -29,8 +29,9 @@ from flask_api import status    # HTTP Status Codes
 from mock import MagicMock, patch
 from app.model import Product, ValidationError, db
 import app.service as service
+import time
 
-DATABASE_URI = os.getenv('DATABASE_URI', 'sqlite:///../db/test.db')
+DATABASE_URI = os.getenv('DATABASE_URI', None)
 
 ######################################################################
 #  T E S T   C A S E S
@@ -44,7 +45,9 @@ class TestProductServer(unittest.TestCase):
         service.app.debug = False
         service.initialize_logging(logging.INFO)
         # Set up the test database
-        service.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+        if DATABASE_URI:
+            service.app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URI
+        service.init_db()
 
     @classmethod
     def tearDownClass(cls):
@@ -52,7 +55,7 @@ class TestProductServer(unittest.TestCase):
 
     def setUp(self):
         """ Runs before each test """
-        service.init_db()
+        # service.init_db()
         db.drop_all()    # clean up the last tests
         db.create_all()  # create new tables
         Product(pid=1,pname="Athens Table", pdesc='Stupid Table', pcat="Table", pprice=20, pcond="Boxed",pinv=2, prev="", prat=5).save()

@@ -255,7 +255,7 @@ def check_content_type(content_type):
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
     if not app.debug:
-        print 'Setting up logging...'
+        print ('Setting up logging...')
         # Set up default logging for submodules to use STDOUT
         # datefmt='%m/%d/%Y %I:%M:%S %p'
         fmt = '[%(asctime)s] %(levelname)s in %(module)s: %(message)s'

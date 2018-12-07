@@ -1,19 +1,23 @@
 import logging
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+import os
 
 # Create Flask application
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../db/products.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'Shhhh'
-app.config['LOGGING_LEVEL'] = logging.INFO
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../db/products.db'
+# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+# app.config['SECRET_KEY'] = 'Shhhh'
+# app.config['LOGGING_LEVEL'] = logging.INFO
+app.config.from_object('config')
+db = SQLAlchemy(app)
 
-import os
-import service, model
+# import os
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 PORT = os.getenv('PORT', '5000')
 
+import service, model
 # Set up logging for production
 print('Setting up logging for {}...'.format(__name__))
 if __name__ != '__main__':
