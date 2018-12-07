@@ -58,6 +58,14 @@ Vagrant.configure("2") do |config|
     vb.memory = "512"
     vb.cpus = 1
   end
+  config.vm.provider "virtualbox" do |vb|
+    # Customize the amount of memory on the VM:
+    vb.memory = "512"
+    vb.cpus = 1
+    # Fixes some DNS issues on some networks
+    vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
+    vb.customize ["modifyvm", :id, "--natdnsproxy1", "on"]
+end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -158,6 +166,35 @@ Vagrant.configure("2") do |config|
     echo " For the Kubernetes Dashboard use:"
     echo " kubectl proxy --address='0.0.0.0'"
     echo "************************************\n"
+  SHELL
+
+  # ######################################################################
+  # # Add MySQL docker container
+  # ######################################################################
+  #  config.vm.provision "docker" do |d|
+  #    d.pull_images "mariadb"
+  #    d.run "mariadb",
+  #      args: "--restart=always -d --name mariadb -p 3306:3306 -v mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=passw0rd"
+  #  end
+   ######################################################################
+  # Add PostgreSQL docker container
+  ######################################################################
+  config.vm.provision "docker" do |d|
+    d.pull_images "postgres"
+    d.run "postgres",
+       args: "-d --name postgres -p 5432:5432 -v postgresql_data:/var/lib/postgresql/data"
+  end
+   # Create the database after Docker is running
+  config.vm.provision "shell", inline: <<-SHELL
+    # Wait for mariadb to come up
+    echo "Waiting 20 seconds for PostgreSQL to start..."
+    sleep 20
+    cd /vagrant
+    docker exec postgres psql -U postgres -c "CREATE DATABASE development;"
+    python manage.py development
+    docker exec postgres psql -U postgres -c "CREATE DATABASE test;"
+    python manage.py test
+    cd
   SHELL
 
 end

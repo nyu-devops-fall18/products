@@ -2,10 +2,9 @@ import logging
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from datetime import datetime
-import ibm_db
-
-
-db = SQLAlchemy()
+# import ibm_db
+# db = SQLAlchemy()
+from . import db
 
 class ValidationError (ValueError):
     pass
