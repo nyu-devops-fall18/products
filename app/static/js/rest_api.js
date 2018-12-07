@@ -212,7 +212,7 @@ $(function() {
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/products?" + product_id,
+            url: "/products?id=" + product_id,
             contentType:"application/json",
             data: ''
         })
@@ -240,7 +240,7 @@ $(function() {
 
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/products?" + product_id,
+            url: "/products?id=" + product_id,
             contentType:"application/json",
             data: '',
         })
