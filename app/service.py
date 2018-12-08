@@ -1,11 +1,11 @@
-from . import app
 import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
-from werkzeug.exceptions import NotFound
+# from werkzeug.exceptions import NotFound
 from app.model import Product, ValidationError
 from flask_restplus import Api, Resource, fields, reqparse, abort
+from . import app
 
 #########################
 # Index Page
@@ -28,6 +28,14 @@ def index():
     #                ), status.HTTP_200_OK
     #Please comment above return statement and uncommment the below return statement FOR BEHAVIORAL TESTING
     return app.send_static_file('index.html')
+
+
+@app.route('/healthcheck')
+def healthcheck():
+    """ Let them know our heart is still beating """
+    return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
+
+
 
 ######################################################################
 # Configure Swagger before initilaizing it
@@ -80,51 +88,45 @@ ns = api.namespace("products", description="Products API")
 #########################
 # error handlers
 #########################
-# @app.errorhandler(ValidationError)
-# def request_validation_error(error):
-#     """ Handles Value Errors from bad data """
-#     return bad_request(error)
-#
-# @app.errorhandler(400)
-# def bad_request(error):
-#     """ Handles bad reuests with 400_BAD_REQUEST """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=400, error='Bad Request', message=message), 400
-#
-# @app.errorhandler(404)
-# def not_found(error):
-#     """ Handles resources not found with 404_NOT_FOUND """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=404, error='Not Found', message=message), 404
-#
-# @app.errorhandler(405)
-# def method_not_supported(error):
-#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=405, error='Method not Allowed', message=message), 405
-#
-# @app.errorhandler(415)
-# def mediatype_not_supported(error):
-#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=415, error='Unsupported media type', message=message), 415
-#
-# @app.errorhandler(500)
-# def internal_server_error(error):
-#     """ Handles unexpected server error with 500_SERVER_ERROR """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=500, error='Internal Server Error', message=message), 500
-#
+@app.errorhandler(ValidationError)
+def request_validation_error(error):
+    """ Handles Value Errors from bad data """
+    return bad_request(error)
 
-@app.route('/healthcheck')
-def healthcheck():
-    """ Let them know our heart is still beating """
-    return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
+@app.errorhandler(400)
+def bad_request(error):
+    """ Handles bad reuests with 400_BAD_REQUEST """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=400, error='Bad Request', message=message), 400
+
+@app.errorhandler(404)
+def not_found(error):
+    """ Handles resources not found with 404_NOT_FOUND """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=404, error='Not Found', message=message), 404
+
+@app.errorhandler(405)
+def method_not_supported(error):
+    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=405, error='Method not Allowed', message=message), 405
+
+@app.errorhandler(415)
+def mediatype_not_supported(error):
+    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=415, error='Unsupported media type', message=message), 415
+
+@app.errorhandler(500)
+def internal_server_error(error):
+    """ Handles unexpected server error with 500_SERVER_ERROR """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=500, error='Internal Server Error', message=message), 500
 
 # @app.route('/products', methods=['GET'])
 @api.route('/products', strict_slashes=False)
@@ -136,6 +138,7 @@ class ProductCollection(Resource):
     #########################
     @api.doc('list_products')
     @api.expect(product_arguments1)
+    @api.response(404,"Product Not Found")
     @api.marshal_list_with(product_model)
     def get(self):
          """ Return all the products"""
@@ -156,8 +159,8 @@ class ProductCollection(Resource):
          else:
              products = Product.all()
          results = [product.serialize() for product in products]
-         return make_response(jsonify(results), status.HTTP_200_OK)
-         # return results,status.HTTP_200_OK
+         # return make_response(jsonify(results), status.HTTP_200_OK)
+         return results,status.HTTP_200_OK
 
     #########################
     # create a product
@@ -177,7 +180,7 @@ class ProductCollection(Resource):
         product.deserialize(api.payload)
         product.save()
         message = product.serialize()
-        location_url = url_for('list_products_by_id', item_id=product.id, _external=True)
+        location_url = api.url_for(ProductCollection, item_id=product.id, _external=True)
         # return make_response(jsonify(message), status.HTTP_201_CREATED,
         #                      {
         #                          'Location': location_url
@@ -203,10 +206,10 @@ class ProductResource(Resource):
             message = product.serialize()
             return_code = status.HTTP_200_OK
         else:
-            message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
-            raise NotFound(message)
-            return_code = status.HTTP_404_NOT_FOUND
+            # message = {'error' : 'Product with id: %s was not found' % str(item_id)}
+            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
+            # raise NotFound(message)
+            # return_code = status.HTTP_404_NOT_FOUND
         return message, return_code
 
     #########################
@@ -261,7 +264,7 @@ class ProductSort(Resource):
     #########################
     @api.doc('sort_products')
     @api.marshal_list_with(product_model)
-    def get():
+    def get(self):
         """List all the product by their updated date"""
         app.logger.info("List products by updated date")
         sorted_products = Product.sort_by_date()
