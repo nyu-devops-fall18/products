@@ -212,7 +212,7 @@ $(function() {
 
         query="id="
         if(product_id){
-            query += str(product_id)
+            query += (product_id)
             }
 
         var ajax = $.ajax({
@@ -245,7 +245,7 @@ $(function() {
 
         query="id="
         if(product_id){
-            query += str(product_id)
+            query += (product_id)
             }
 
         var ajax = $.ajax({
