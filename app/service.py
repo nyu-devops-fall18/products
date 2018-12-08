@@ -5,6 +5,7 @@ from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
 from werkzeug.exceptions import NotFound
 from app.model import Product, ValidationError
+from flask_restplus import Api, Resource, fields, reqparse, abort
 
 ######################################################################
 # Configure Swagger before initilaizing it
@@ -57,40 +58,40 @@ ns = api.namespace("products", description="Products API")
 #########################
 # error handlers
 #########################
-@api.errorhandler(ValidationError)
+@app.errorhandler(ValidationError)
 def request_validation_error(error):
     """ Handles Value Errors from bad data """
     return bad_request(error)
 
-@api.errorhandler(400)
+@app.errorhandler(400)
 def bad_request(error):
     """ Handles bad reuests with 400_BAD_REQUEST """
     message = error.message or str(error)
     app.logger.info(message)
     return jsonify(status=400, error='Bad Request', message=message), 400
 
-@api.errorhandler(404)
+@app.errorhandler(404)
 def not_found(error):
     """ Handles resources not found with 404_NOT_FOUND """
     message = error.message or str(error)
     app.logger.info(message)
     return jsonify(status=404, error='Not Found', message=message), 404
 
-@api.errorhandler(405)
+@app.errorhandler(405)
 def method_not_supported(error):
     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
     message = error.message or str(error)
     app.logger.info(message)
     return jsonify(status=405, error='Method not Allowed', message=message), 405
 
-@api.errorhandler(415)
+@app.errorhandler(415)
 def mediatype_not_supported(error):
     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
     message = error.message or str(error)
     app.logger.info(message)
     return jsonify(status=415, error='Unsupported media type', message=message), 415
 
-@api.errorhandler(500)
+@app.errorhandler(500)
 def internal_server_error(error):
     """ Handles unexpected server error with 500_SERVER_ERROR """
     message = error.message or str(error)
@@ -100,7 +101,7 @@ def internal_server_error(error):
 #########################
 # Index Page
 #########################
-@api.route("/")
+@app.route("/")
 def index():
     app.logger.info(Product.query.all())
     # return jsonify(name="Product Demo REST API Service",
@@ -119,7 +120,7 @@ def index():
     #Please comment above return statement and uncommment the below return statement FOR BEHAVIORAL TESTING
     return app.send_static_file('index.html')
 
-@api.route('/healthcheck')
+@app.route('/healthcheck')
 def healthcheck():
     """ Let them know our heart is still beating """
     return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
@@ -181,10 +182,7 @@ class ProductCollection(Resource):
         #                      {
         #                          'Location': location_url
         #                      })
-        return product.serialize,status.HTTP_201_CREATED,
-                            {
-                                 'Location': location_url
-                             }
+        return product.serialize,status.HTTP_201_CREATED,{'Location':location_url }
 
 
 @api.route('/products/<int:item_id>')
@@ -206,7 +204,7 @@ class ProductResource(Resource):
             return_code = status.HTTP_200_OK
         else:
             #message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id)})
+            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
             # raise NotFound(message)
             ## return_code = status.HTTP_404_NOT_FOUND
         return message, return_code
@@ -227,7 +225,7 @@ class ProductResource(Resource):
         # app.logger.info(product.rating)
         # prevrating = product.rating
         if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id)})
+            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
             # raise NotFound("Product with id {} not found".format(item_id))
         # app.logger.info(product.deserialize(request.get_json()))
         hitcount = product.updateCount
@@ -323,7 +321,7 @@ class ProductRating(Resource):
         # newrating = request.args.get('stars')
         # print(newrating)
         if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id)})
+            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
             # raise NotFound("Product with id {} not found".format(item))
         # app.logger.info(product.deserialize(request.get_json()))
         # product.deserialize(request.get_json())
@@ -358,7 +356,7 @@ class ProductReview(Resource):
         newreview =  str ((product_arguments2.parse_args())['rev'])
         print(newreview)
         if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id)})
+            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
         if not product.review:
              product.review = str(newreview)
         else:
