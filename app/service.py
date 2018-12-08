@@ -7,6 +7,28 @@ from werkzeug.exceptions import NotFound
 from app.model import Product, ValidationError
 from flask_restplus import Api, Resource, fields, reqparse, abort
 
+#########################
+# Index Page
+#########################
+@app.route("/", methods=['GET'])
+def index():
+    app.logger.info(Product.query.all())
+    # return jsonify(name="Product Demo REST API Service",
+    #                version='1.0', Get_All_Products="[GET] /products",
+    #                Get_Latest_Products="[GET] /products/latest",
+    #                Get_Product_By_ID="[GET] /products?id=<item_id>",
+    #                Get_Product_By_Category="[GET] /products?category=<category>",
+    #                Get_Product_By_Name="[GET] /products?name=<name>",
+    #                Get_Product_By_PriceRange="[GET] /products/pricerange?minimum=<min-price>&maximum=<max_price>",
+    #                Create_Product="[POST] /products/",
+    #                Update_Product="[PUT] /products/<item_id>",
+    #                Update_Product_Rating="[PUT] /products/rating/<item_id>?stars=<rating from [1,10]>",
+    #                Delete_Product="[DELETE] /products/<item_id>",
+    #                Delete_All_Products="[DELETE] /products"
+    #                ), status.HTTP_200_OK
+    #Please comment above return statement and uncommment the below return statement FOR BEHAVIORAL TESTING
+    return app.send_static_file('index.html')
+
 ######################################################################
 # Configure Swagger before initilaizing it
 ######################################################################
@@ -58,73 +80,51 @@ ns = api.namespace("products", description="Products API")
 #########################
 # error handlers
 #########################
-@app.errorhandler(ValidationError)
-def request_validation_error(error):
-    """ Handles Value Errors from bad data """
-    return bad_request(error)
-
-@app.errorhandler(400)
-def bad_request(error):
-    """ Handles bad reuests with 400_BAD_REQUEST """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=400, error='Bad Request', message=message), 400
-
-@app.errorhandler(404)
-def not_found(error):
-    """ Handles resources not found with 404_NOT_FOUND """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=404, error='Not Found', message=message), 404
-
-@app.errorhandler(405)
-def method_not_supported(error):
-    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=405, error='Method not Allowed', message=message), 405
-
-@app.errorhandler(415)
-def mediatype_not_supported(error):
-    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=415, error='Unsupported media type', message=message), 415
-
-@app.errorhandler(500)
-def internal_server_error(error):
-    """ Handles unexpected server error with 500_SERVER_ERROR """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=500, error='Internal Server Error', message=message), 500
-
-#########################
-# Index Page
-#########################
-@app.route("/")
-def index():
-    app.logger.info(Product.query.all())
-    # return jsonify(name="Product Demo REST API Service",
-    #                version='1.0', Get_All_Products="[GET] /products",
-    #                Get_Latest_Products="[GET] /products/latest",
-    #                Get_Product_By_ID="[GET] /products?id=<item_id>",
-    #                Get_Product_By_Category="[GET] /products?category=<category>",
-    #                Get_Product_By_Name="[GET] /products?name=<name>",
-    #                Get_Product_By_PriceRange="[GET] /products/pricerange?minimum=<min-price>&maximum=<max_price>",
-    #                Create_Product="[POST] /products/",
-    #                Update_Product="[PUT] /products/<item_id>",
-    #                Update_Product_Rating="[PUT] /products/rating/<item_id>?stars=<rating from [1,10]>",
-    #                Delete_Product="[DELETE] /products/<item_id>",
-    #                Delete_All_Products="[DELETE] /products"
-    #                ), status.HTTP_200_OK
-    #Please comment above return statement and uncommment the below return statement FOR BEHAVIORAL TESTING
-    return app.send_static_file('index.html')
+# @app.errorhandler(ValidationError)
+# def request_validation_error(error):
+#     """ Handles Value Errors from bad data """
+#     return bad_request(error)
+#
+# @app.errorhandler(400)
+# def bad_request(error):
+#     """ Handles bad reuests with 400_BAD_REQUEST """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=400, error='Bad Request', message=message), 400
+#
+# @app.errorhandler(404)
+# def not_found(error):
+#     """ Handles resources not found with 404_NOT_FOUND """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=404, error='Not Found', message=message), 404
+#
+# @app.errorhandler(405)
+# def method_not_supported(error):
+#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=405, error='Method not Allowed', message=message), 405
+#
+# @app.errorhandler(415)
+# def mediatype_not_supported(error):
+#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=415, error='Unsupported media type', message=message), 415
+#
+# @app.errorhandler(500)
+# def internal_server_error(error):
+#     """ Handles unexpected server error with 500_SERVER_ERROR """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=500, error='Internal Server Error', message=message), 500
+#
 
 @app.route('/healthcheck')
 def healthcheck():
     """ Let them know our heart is still beating """
     return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
-
 
 # @app.route('/products', methods=['GET'])
 @api.route('/products', strict_slashes=False)
@@ -156,8 +156,8 @@ class ProductCollection(Resource):
          else:
              products = Product.all()
          results = [product.serialize() for product in products]
-         # return make_response(jsonify(results), status.HTTP_200_OK)
-         return results,status.HTTP_200_OK
+         return make_response(jsonify(results), status.HTTP_200_OK)
+         # return results,status.HTTP_200_OK
 
     #########################
     # create a product
@@ -170,7 +170,7 @@ class ProductCollection(Resource):
     def post(self):
         """
         Creates a Product
-        This endpoint will create a Pet based the data in the body that is posted
+        This endpoint will create a Product based the data in the body that is posted
         """
         check_content_type('application/json')
         product = Product(1,"","","",0,"",0,"",0)
@@ -182,7 +182,7 @@ class ProductCollection(Resource):
         #                      {
         #                          'Location': location_url
         #                      })
-        return product.serialize,status.HTTP_201_CREATED,{'Location':location_url }
+        return product.serialize(),status.HTTP_201_CREATED,{'Location':location_url }
 
 
 @api.route('/products/<int:item_id>')
@@ -203,10 +203,10 @@ class ProductResource(Resource):
             message = product.serialize()
             return_code = status.HTTP_200_OK
         else:
-            #message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
-            # raise NotFound(message)
-            ## return_code = status.HTTP_404_NOT_FOUND
+            message = {'error' : 'Product with id: %s was not found' % str(item_id)}
+            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
+            raise NotFound(message)
+            return_code = status.HTTP_404_NOT_FOUND
         return message, return_code
 
     #########################
