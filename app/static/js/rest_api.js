@@ -211,8 +211,9 @@ $(function() {
         var product_id = $("#product_id").val();
 
         query="id="
-        if(product_id):
+        if(product_id){
             query += str(product_id)
+            }
 
         var ajax = $.ajax({
             type: "GET",
@@ -243,8 +244,9 @@ $(function() {
         var product_id = $("#product_id").val();
 
         query="id="
-        if(product_id):
+        if(product_id){
             query += str(product_id)
+            }
 
         var ajax = $.ajax({
             type: "DELETE",
