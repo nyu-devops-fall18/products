@@ -210,14 +210,9 @@ $(function() {
 
         var product_id = $("#product_id").val();
 
-        query="id="
-        if(product_id){
-            query += (product_id)
-            }
-
         var ajax = $.ajax({
             type: "GET",
-            url: "/products?" + query,
+            url: "/products/" + product_id,
             contentType:"application/json",
             data: ''
         })
@@ -243,14 +238,9 @@ $(function() {
 
         var product_id = $("#product_id").val();
 
-        query="id="
-        if(product_id){
-            query += (product_id)
-            }
-
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/products?" + query,
+            url: "/products/" + product_id,
             contentType:"application/json",
             data: '',
         })
@@ -265,6 +255,7 @@ $(function() {
             flash_message("Server error!")
         });
     });
+
 
     // ****************************************
     // Clear the form
