@@ -210,9 +210,13 @@ $(function() {
 
         var product_id = $("#product_id").val();
 
+        query="id="
+        if(product_id):
+            query += str(product_id)
+
         var ajax = $.ajax({
             type: "GET",
-            url: "/products?id=" + product_id,
+            url: "/products?" + query,
             contentType:"application/json",
             data: ''
         })
@@ -238,9 +242,13 @@ $(function() {
 
         var product_id = $("#product_id").val();
 
+        query="id="
+        if(product_id):
+            query += str(product_id)
+
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/products?id=" + product_id,
+            url: "/products?" + query,
             contentType:"application/json",
             data: '',
         })
