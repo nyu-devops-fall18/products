@@ -212,7 +212,7 @@ $(function() {
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/products?id=" + product_id,
+            url: "/products/" + product_id,
             contentType:"application/json",
             data: ''
         })
@@ -240,7 +240,7 @@ $(function() {
 
         var ajax = $.ajax({
             type: "DELETE",
-            url: "/products?id=" + product_id,
+            url: "/products/" + product_id,
             contentType:"application/json",
             data: '',
         })
@@ -255,6 +255,7 @@ $(function() {
             flash_message("Server error!")
         });
     });
+
 
     // ****************************************
     // Clear the form
