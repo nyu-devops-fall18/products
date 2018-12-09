@@ -324,7 +324,7 @@ class ProductRating(Resource):
         # newrating = request.args.get('stars')
         # print(newrating)
         if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
+            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
             # raise NotFound("Product with id {} not found".format(item))
         # app.logger.info(product.deserialize(request.get_json()))
         # product.deserialize(request.get_json())
@@ -346,7 +346,7 @@ class ProductReview(Resource):
     # update product review by ID
     #############################
     # @app.route("/products/review", methods=["PUT"])
-    @api.doc('update_product_rating')
+    @api.doc('update_product_review')
     @api.expect(product_arguments3)
     @api.marshal_with(product_model)
     @api.response(404,"Product Not Found")
@@ -359,7 +359,7 @@ class ProductReview(Resource):
         newreview =  str ((product_arguments2.parse_args())['rev'])
         print(newreview)
         if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
+            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
         if not product.review:
              product.review = str(newreview)
         else:
