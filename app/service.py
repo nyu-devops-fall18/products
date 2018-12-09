@@ -268,7 +268,7 @@ class ProductSort(Resource):
         """List all the product by their updated date"""
         app.logger.info("List products by updated date")
         sorted_products = Product.sort_by_date()
-        results = [ product.serialize() for product in sorted_products]
+        results = [product.serialize() for product in sorted_products]
         # return make_response(jsonify(results), status.HTTP_200_OK)
         return results,status.HTTP_200_OK
 
