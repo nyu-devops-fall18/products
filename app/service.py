@@ -236,11 +236,7 @@ class ProductResource(Resource):
             # app.logger.info(product)
             return product.serialize(), status.HTTP_200_OK
         else:
-            # message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
             return make_response('Product with id {} was not found'.format(item_id), status.HTTP_404_NOT_FOUND)
-            # return_code = status.HTTP_404_NotFound
-        # return message, return_code
 
     #########################
     # update product by ID
@@ -348,7 +344,7 @@ class ProductRating(Resource):
     #############################
     @api.doc('update_product_rating')
     @api.expect(product_arguments2)
-    @api.marshal_with(product_model)
+    # @api.marshal_with(product_model)
     @api.response(404,"Product Not Found")
     def put(self):
         try:
@@ -361,6 +357,7 @@ class ProductRating(Resource):
             # newrating = int ((product_arguments2.parse_args())['rating'])
             product = Product.find_by_id(item)
             newrating = request.args.get('stars')
+            print(product)
             print(newrating)
             if not product:
                 # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))

@@ -143,6 +143,21 @@ class TestProductServer(unittest.TestCase):
         self.assertEqual(len(data), product_count + 1)
         self.assertIn(new_json, data)
 
+    def test_create_product_bad_request(self):
+        """ Create a new Product with a bad data"""
+        # save the current number of products for later comparison
+        product_count = self.get_product_count()
+        # add a new product
+        new_product = dict(id=3, name='Greek Table', category="Table", price=12, condition="Boxed", inventory=2, review="Amazing", rating=2)
+        data = json.dumps(new_product)
+        resp = self.app.post('/products',
+                             data=data,
+                             content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+        # Make sure location header is set
+        location = resp.headers.get('Location', None)
+        self.assertTrue(location is None)
+
     def test_update_product(self):
         """ Update an existing Product """
         product = Product.find_by_name('Athens Table')[0]
@@ -155,6 +170,17 @@ class TestProductServer(unittest.TestCase):
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['category'], 'Fancy Table')
 
+    def test_update_product_bad_request(self):
+        """ Update an existing Product with bad data"""
+        product = Product.find_by_name('Athens Table')[0]
+        new_product = dict(id=1,name='Athens Table', category="Fancy Table", price=20, condition="Boxed", inventory=2,
+                           review="So so", rating=8)
+        data = json.dumps(new_product)
+        resp = self.app.put('/products/{}'.format(product.id),
+                            data=data,
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_update_product_rating(self):
         """ Update an existing Product Rating """
         product = Product.find_by_name('Athens Table')[0]
@@ -166,6 +192,34 @@ class TestProductServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['rating'], 7)
+
+    def test_update_product_rating_invalid_id(self):
+        """ Update an existing Product Rating with invalid ID"""
+        resp = self.app.put('/products/rating',
+                            query_string='id=0&stars=1',
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_product_rating_missing_param(self):
+        """ Update an existing Product Rating with missing parameter"""
+        resp = self.app.put('/products/rating',
+                            query_string='id=1',
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_product_rating_invalid_rating(self):
+        """ Update an existing Product Rating with invalid rating"""
+        resp = self.app.put('/products/rating',
+                            query_string='id=1&stars=21',
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_update_product_rating_invalid_rating_type(self):
+        """ Update an existing Product Rating with invalid rating type"""
+        resp = self.app.put('/products/rating',
+                            query_string='id=1&stars=sdaf',
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_product_review(self):
         """ Update an existing Product Review """
@@ -183,6 +237,20 @@ class TestProductServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_200_OK)
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['review'], 'Average|Awesome')
+
+    def test_update_product_review_invalid_id(self):
+        """ Update an existing Product Review with invalid ID"""
+        resp = self.app.put('/products/review',
+                            query_string='id=0&newrev=Average',
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_update_product_review_missing_param(self):
+        """ Update an existing Product Review with missing param"""
+        resp = self.app.put('/products/review',
+                            query_string='id=1',
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_delete_product(self):
         """ Delete a Product """
