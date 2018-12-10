@@ -256,7 +256,7 @@ class ProductResource(Resource):
         # prevrating = product.rating
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
-            raise make_response("Product with id {} not found".format(item_id),status.HTTP_404_NOT_FOUND)
+            return make_response("Product with id {} not found".format(item_id),status.HTTP_404_NOT_FOUND)
         # app.logger.info(product.deserialize(request.get_json()))
         hitcount = product.updateCount
         product.deserialize(api.payload)
