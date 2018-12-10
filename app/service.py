@@ -182,20 +182,22 @@ class ProductCollection(Resource):
         Creates a Product
         This endpoint will create a Product based the data in the body that is posted
         """
-
-        check_content_type('application/json')
-        product = Product(1,"","","",0,"",0,"",0)
-        # product = Product()
-        # app.logger.info((api.payload))
-        product.deserialize(api.payload)
-        product.save()
-        message = product.serialize()
-        location_url = api.url_for(ProductCollection, item_id=product.id, _external=True)
-        # return make_response(jsonify(message), status.HTTP_201_CREATED,
-        #                      {
-        #                          'Location': location_url
-        #                      })
-        return product.serialize(),status.HTTP_201_CREATED,{'Location':location_url }
+        try:
+            check_content_type('application/json')
+            product = Product(1,"","","",0,"",0,"",0)
+            # product = Product()
+            # app.logger.info((api.payload))
+            product.deserialize(api.payload)
+            product.save()
+            message = product.serialize()
+            location_url = api.url_for(ProductCollection, item_id=product.id, _external=True)
+            # return make_response(jsonify(message), status.HTTP_201_CREATED,
+            #                      {
+            #                          'Location': location_url
+            #                      })
+            return product.serialize(),status.HTTP_201_CREATED,{'Location':location_url }
+        except ValidationError:
+            raise MethodNotAllowed('Invalid Data', status.HTTP_400_BAD_REQUEST)
 
     #########################
     # delete all products
