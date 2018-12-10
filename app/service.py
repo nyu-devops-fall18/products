@@ -404,10 +404,10 @@ class ProductReview(Resource):
             return MethodNotAllowed("Review should be an empty string atleast")
         else:
             product.review = str(product.review) + "|" + str(newreview)
-        product.update()
+            product.update()
+            return product.serialize(), status.HTTP_200_OK
 
         # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
-        return product.serialize(),status.HTTP_200_OK
 
 
 def check_content_type(content_type):
