@@ -281,7 +281,7 @@ $(function() {
         var review = $("#product_review").val();
         var rating = $("#product_rating").val();
 
-        var queryString = ""
+        var queryString = "?"
 
         if (name) {
             queryString += 'name=' + name
@@ -318,7 +318,7 @@ $(function() {
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/products?" + queryString,
+            url: "/products" + queryString,
             contentType:"application/json",
             data: ''
         })
