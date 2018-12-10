@@ -230,7 +230,7 @@ class ProductResource(Resource):
             return make_response("Invalid Product ID", status.HTTP_400_BAD_REQUEST)
         product = Product.find_by_id(item_id)
         if product:
-            app.logger.info(product)
+            # app.logger.info(product)
             return product.serialize(), status.HTTP_200_OK
         else:
             # message = {'error' : 'Product with id: %s was not found' % str(item_id)}
@@ -247,7 +247,7 @@ class ProductResource(Resource):
     @api.expect(product_model)
     @api.response(400, "Validation Error")
     @api.response(404, "Product Not Found")
-    @api.marshal_with(product_model)
+    # @api.marshal_with(product_model)
     def put(self,item_id):
         """ Updates a product by ID"""
         app.logger.info("Fetching the product")
@@ -384,7 +384,7 @@ class ProductReview(Resource):
     # @app.route("/products/review", methods=["PUT"])
     @api.doc('update_product_review')
     @api.expect(product_arguments3)
-    @api.marshal_with(product_model)
+    # @api.marshal_with(product_model)
     @api.response(404,"Product Not Found")
     def put(self, ):
         """Updates product review with review provided as newrev"""
@@ -399,14 +399,16 @@ class ProductReview(Resource):
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
             return make_response("Product with id {} not found".format(item),status.HTTP_404_NOT_FOUND)
-        if not product.review:
-             product.review = str(newreview)
-        elif not newreview:
-            return make_response("Review should be an empty string atleast",status.HTTP_400_BAD_REQUEST)
+        if not newreview:
+            return make_response("Review should be an empty string atleast", status.HTTP_400_BAD_REQUEST)
+        elif not product.review:
+            print(newreview)
+            product.review = str(newreview)
         else:
             product.review = str(product.review) + "|" + str(newreview)
+            print(product.review)
             product.update()
-            return product.serialize(), status.HTTP_200_OK
+        return product.serialize(), status.HTTP_200_OK
 
         # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
 
