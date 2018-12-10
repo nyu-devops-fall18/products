@@ -100,40 +100,40 @@ def request_validation_error(error):
         'message': message
     }, status.HTTP_400_BAD_REQUEST
 
-# @app.errorhandler(400)
-# def bad_request(error):
-#     """ Handles bad reuests with 400_BAD_REQUEST """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=400, error='Bad Request', message=message), 400
+@app.errorhandler(400)
+def bad_request(error):
+    """ Handles bad reuests with 400_BAD_REQUEST """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=400, error='Bad Request', message=message), 400
 
-# @app.errorhandler(404)
-# def not_found(error):
-#     """ Handles resources not found with 404_NOT_FOUND """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=404, error='Not Found', message=message), 404
+@app.errorhandler(404)
+def not_found(error):
+    """ Handles resources not found with 404_NOT_FOUND """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=404, error='Not Found', message=message), 404
 
-# @app.errorhandler(405)
-# def method_not_supported(error):
-#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=405, error='Method not Allowed', message=message), 405
+@app.errorhandler(405)
+def method_not_supported(error):
+    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=405, error='Method not Allowed', message=message), 405
 
-# @app.errorhandler(415)
-# def mediatype_not_supported(error):
-#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=415, error='Unsupported media type', message=message), 415
+@app.errorhandler(415)
+def mediatype_not_supported(error):
+    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=415, error='Unsupported media type', message=message), 415
 
-# @app.errorhandler(500)
-# def internal_server_error(error):
-#     """ Handles unexpected server error with 500_SERVER_ERROR """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=500, error='Internal Server Error', message=message), 500
+@app.errorhandler(500)
+def internal_server_error(error):
+    """ Handles unexpected server error with 500_SERVER_ERROR """
+    message = error.message or str(error)
+    app.logger.info(message)
+    return jsonify(status=500, error='Internal Server Error', message=message), 500
 
 # @app.route('/products', methods=['GET'])
 @api.route('/products', strict_slashes=False)
@@ -183,7 +183,8 @@ class ProductCollection(Resource):
         This endpoint will create a Product based the data in the body that is posted
         """
         check_content_type('application/json')
-        product = Product(1,"","","",0,"",0,"",0)
+        # product = Product(1,"","","",0,"",0,"",0)
+        product = Product()
         product.deserialize(api.payload)
         product.save()
         message = product.serialize()
@@ -193,6 +194,18 @@ class ProductCollection(Resource):
         #                          'Location': location_url
         #                      })
         return product.serialize(),status.HTTP_201_CREATED,{'Location':location_url }
+
+    #########################
+    # delete all products
+    #########################
+
+    @api.doc("deleteallproducts")
+    # @app.route("/products", methods=["DELETE"])
+    def delete(self):
+        """ Deletes all the products"""
+        app.logger.info("Deleting all products")
+        Product.delete_all()
+        return make_response(" ", status.HTTP_204_NO_CONTENT)
 
 
 @api.route('/products/<int:item_id>')
@@ -208,15 +221,16 @@ class ProductResource(Resource):
     @api.response(404, "Product Not Found")
     @api.marshal_with(product_model)
     def get(self,item_id):
+        """ Finds a product by ID"""
         app.logger.info('Finding a Product with id [{}]'.format(item_id))
         product = Product.find_by_id(item_id)
         if product:
             message = product.serialize()
             return_code = status.HTTP_200_OK
         else:
-            # message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
-            # raise NotFound(message)
+            message = {'error' : 'Product with id: %s was not found' % str(item_id)}
+            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
+            raise not_found(message)
             # return_code = status.HTTP_404_NOT_FOUND
         return message, return_code
 
@@ -230,14 +244,15 @@ class ProductResource(Resource):
     @api.response(404, "Product Not Found")
     @api.marshal_with(product_model)
     def put(self,item_id):
+        """ Updates a product by ID"""
         app.logger.info("Fetching the product")
         check_content_type("application/json")
         product = Product.find_by_id(item_id)
         # app.logger.info(product.rating)
         # prevrating = product.rating
         if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
-            # raise NotFound("Product with id {} not found".format(item_id))
+            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
+            raise not_found("Product with id {} not found".format(item_id))
         # app.logger.info(product.deserialize(request.get_json()))
         hitcount = product.updateCount
         product.deserialize(api.payload)
@@ -254,6 +269,7 @@ class ProductResource(Resource):
     @api.doc('delete_products')
     @api.response(204, "Product Deleted")
     def delete(self,item_id):
+        """ Deletes a product by ID"""
         app.logger.info("Deleting the product for the id provided")
         product = Product.find_by_id(item_id)
         # if not product:
@@ -294,6 +310,7 @@ class ProductPrice(Resource):
     @api.expect(product_arguments)
     @api.marshal_list_with(product_model)
     def get(self):
+        """List all the product by their price range"""
         app.logger.info("Fetching products by provided price range")
         # app.logger.info(request.args.get('minimum'))
         minimum = request.args.get('minimum')
@@ -323,6 +340,7 @@ class ProductRating(Resource):
     @api.marshal_with(product_model)
     @api.response(404,"Product Not Found")
     def put(self):
+        """Updates product rating with rating provided as stars"""
         app.logger.info("Fetching the product")
         item = request.args.get("id")
         # check_content_type("application/json")
@@ -333,8 +351,10 @@ class ProductRating(Resource):
         newrating = request.args.get('stars')
         print(newrating)
         if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
-            # raise NotFound("Product with id {} not found".format(item))
+            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
+            raise not_found("Product with id {} not found".format(item))
+        if newrating > 10 or newrating < 1:
+            raise method_not_supported("Rating should be between 1-10")
         # app.logger.info(product.deserialize(request.get_json()))
         # product.deserialize(request.get_json())
         # product.id = item_id
@@ -360,6 +380,7 @@ class ProductReview(Resource):
     @api.marshal_with(product_model)
     @api.response(404,"Product Not Found")
     def put(self, ):
+        """Updates product review with review provided as newrev"""
         app.logger.info("Fetching the product")
         item = request.args.get("id")
         # item = int((product_arguments3.parse_args())['id'])
@@ -369,9 +390,12 @@ class ProductReview(Resource):
         # newreview =  str ((product_arguments2.parse_args())['rev'])
         print(newreview)
         if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
+            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
+            return not_found("Product with id {} not found".format(item))
         if not product.review:
              product.review = str(newreview)
+        if not newreview:
+            return method_not_supported("Review should be an empty string atleast")
         else:
             product.review = str(product.review) + "|" + str(newreview)
         product.update()
@@ -379,15 +403,6 @@ class ProductReview(Resource):
         # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
         return product.serialize(),status.HTTP_200_OK
 
-
-#########################
-# delete all products
-#########################
-@app.route("/products", methods=["DELETE"])
-def deleteallproducts():
-    app.logger.info("Deleting all products")
-    Product.delete_all()
-    return make_response(" ", status.HTTP_204_NO_CONTENT)
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """
