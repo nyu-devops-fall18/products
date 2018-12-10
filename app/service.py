@@ -357,6 +357,8 @@ class ProductRating(Resource):
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
             return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
+        elif newrating == '' or newrating is None:
+            raise MethodNotAllowed("Rating cannot be empty", status.HTTP_400_BAD_REQUEST)
         elif int(newrating) > 10 or int(newrating) < 1:
             # app.logger.info("WOOHOO")
             # app.logger.info(newrating)
@@ -398,8 +400,8 @@ class ProductReview(Resource):
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
             return make_response("Product with id {} not found".format(item),status.HTTP_404_NOT_FOUND)
-        if not newreview:
-            return make_response("Review should be an empty string atleast", status.HTTP_400_BAD_REQUEST)
+        if newreview == '' or newreview is None:
+            raise MethodNotAllowed("Review should be an empty string atleast", status.HTTP_400_BAD_REQUEST)
         elif not product.review:
             print(newreview)
             product.review = str(newreview)
