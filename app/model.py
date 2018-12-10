@@ -81,6 +81,10 @@ class Product(db.Model):
             if not(productdata['name'] or productdata['description'] or productdata['category'] or productdata['price']
             or productdata['condition'] or productdata['inventory'] or productdata['review'] or productdata['rating']):
                 raise ValidationError('Field cannot be None')
+
+            for i in productdata.values():
+                if(i == ''):
+                    raise ValidationError('Field cannot be empty string')
                 # return make_response("Fields cannot be None", status.HTTP_400_BAD_REQUEST)
             self.name = productdata['name']
             self.description = productdata['description']
