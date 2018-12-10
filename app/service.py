@@ -399,31 +399,32 @@ class ProductReview(Resource):
     @api.expect(product_arguments3)
     # @api.marshal_with(product_model)
     @api.response(404,"Product Not Found")
-    def put(self, ):
-        """Updates product review with review provided as newrev"""
-        app.logger.info("Fetching the product")
-        item = request.args.get("id")
-        # item = int((product_arguments3.parse_args())['id'])
-        check_content_type("application/json")
-        product = Product.find_by_id(item)
-        newreview = request.args.get('newrev')
-        # newreview =  str ((product_arguments2.parse_args())['rev'])
-        print(newreview)
-        if not product:
-            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
-            return make_response("Product with id {} not found".format(item),status.HTTP_404_NOT_FOUND)
-        if newreview == '' or newreview is None:
-            return request_validation_error("Review should be an empty string atleast")
-        elif not product.review:
+    def put(self):
+        try:
+            """Updates product review with review provided as newrev"""
+            app.logger.info("Fetching the product")
+            item = request.args.get("id")
+            # item = int((product_arguments3.parse_args())['id'])
+            check_content_type("application/json")
+            product = Product.find_by_id(item)
+            newreview = request.args.get('newrev')
+            # newreview =  str ((product_arguments2.parse_args())['rev'])
             print(newreview)
-            product.review = str(newreview)
-        else:
-            product.review = str(product.review) + "|" + str(newreview)
-            print(product.review)
-            product.update()
-        return product.serialize(), status.HTTP_200_OK
-
-        # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
+            if not product:
+                # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
+                return make_response("Product with id {} not found".format(item),status.HTTP_404_NOT_FOUND)
+            if newreview == '' or newreview is None:
+                return request_validation_error("Review should be an empty string atleast")
+            elif not product.review:
+                print(newreview)
+                product.review = str(newreview)
+            else:
+                product.review = str(product.review) + "|" + str(newreview)
+                print(product.review)
+                product.update()
+            return product.serialize(), status.HTTP_200_OK
+        except Exception:
+            return request_validation_error("Invalid request")
 
 
 def check_content_type(content_type):
