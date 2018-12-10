@@ -88,17 +88,18 @@ ns = api.namespace("products", description="Products API")
 #########################
 # error handlers
 # #########################
-# @app.errorhandler(ValidationError)
-# def request_validation_error(error):
-#     """ Handles Value Errors from bad data """
-#     # return bad_request(error)
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return {
-#         'status_code': status.HTTP_400_BAD_REQUEST,
-#         'error': 'Bad Request',
-#         'message': message
-#     }, status.HTTP_400_BAD_REQUEST
+
+@app.errorhandler(ValidationError)
+def request_validation_error(error):
+    """ Handles Value Errors from bad data """
+    # return bad_request(error)
+    message = str(error)
+    app.logger.info(message)
+    return {
+        'status_code': status.HTTP_400_BAD_REQUEST,
+        'error': 'Bad Request',
+        'message': message
+    }, status.HTTP_400_BAD_REQUEST
 #
 # @app.errorhandler(400)
 # def bad_request(error):
@@ -197,7 +198,7 @@ class ProductCollection(Resource):
             #                      })
             return product.serialize(),status.HTTP_201_CREATED,{'Location':location_url }
         except ValidationError:
-            raise MethodNotAllowed('Invalid Data', status.HTTP_400_BAD_REQUEST)
+            return request_validation_error('Invalid Data')
 
     #########################
     # delete all products
@@ -228,7 +229,7 @@ class ProductResource(Resource):
         """ Finds a product by ID"""
         app.logger.info('Finding a Product with id [{}]'.format(item_id))
         if not isinstance(item_id, int):
-            return make_response("Invalid Product ID", status.HTTP_400_BAD_REQUEST)
+            return request_validation_error("Invalid Product ID")
         product = Product.find_by_id(item_id)
         if product:
             # app.logger.info(product)
@@ -251,23 +252,26 @@ class ProductResource(Resource):
     # @api.marshal_with(product_model)
     def put(self,item_id):
         """ Updates a product by ID"""
-        app.logger.info("Fetching the product")
-        check_content_type("application/json")
-        product = Product.find_by_id(item_id)
-        # app.logger.info(product.rating)
-        # prevrating = product.rating
-        if not product:
-            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
-            return make_response("Product with id {} not found".format(item_id),status.HTTP_404_NOT_FOUND)
-        # app.logger.info(product.deserialize(request.get_json()))
-        hitcount = product.updateCount
-        product.deserialize(api.payload)
-        product.id = item_id
-        # app.logger.info(product.rating)
-        product.rating = product.totalrating/(hitcount+1)
-        product.update()
-        # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
-        return product.serialize(),status.HTTP_200_OK
+        try:
+            app.logger.info("Fetching the product")
+            check_content_type("application/json")
+            product = Product.find_by_id(item_id)
+            # app.logger.info(product.rating)
+            # prevrating = product.rating
+            if not product:
+                # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
+                return make_response("Product with id {} not found".format(item_id),status.HTTP_404_NOT_FOUND)
+            # app.logger.info(product.deserialize(request.get_json()))
+            hitcount = product.updateCount
+            product.deserialize(api.payload)
+            product.id = item_id
+            # app.logger.info(product.rating)
+            product.rating = product.totalrating/(hitcount+1)
+            product.update()
+            # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
+            return product.serialize(),status.HTTP_200_OK
+        except ValidationError:
+            return request_validation_error('Invalid data provided')
 
     #########################
     # delete product by ID
@@ -360,7 +364,7 @@ class ProductRating(Resource):
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
             return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
         elif newrating == '' or newrating is None:
-            raise MethodNotAllowed("Rating cannot be empty", status.HTTP_400_BAD_REQUEST)
+            return request_validation_error("Rating cannot be empty")
         elif int(newrating) > 10 or int(newrating) < 1:
             # app.logger.info("WOOHOO")
             # app.logger.info(newrating)
@@ -403,7 +407,7 @@ class ProductReview(Resource):
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
             return make_response("Product with id {} not found".format(item),status.HTTP_404_NOT_FOUND)
         if newreview == '' or newreview is None:
-            raise MethodNotAllowed("Review should be an empty string atleast", status.HTTP_400_BAD_REQUEST)
+            return request_validation_error("Review should be an empty string atleast")
         elif not product.review:
             print(newreview)
             product.review = str(newreview)
