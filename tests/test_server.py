@@ -252,6 +252,13 @@ class TestProductServer(unittest.TestCase):
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_update_product_review_missing_parameters(self):
+        """ Update an existing Product Review with both missing parameters"""
+        resp = self.app.put('/products/review',
+                            query_string='',
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_delete_product(self):
         """ Delete a Product """
         product = Product.find_by_name('Athens Table')[0]
