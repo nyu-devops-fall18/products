@@ -353,8 +353,8 @@ class ProductRating(Resource):
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
             raise NotFound("Product with id {} not found".format(item))
         elif int(newrating) > 10 or int(newrating) < 1:
-            app.logger.info("WOOHOO")
-            app.logger.info(newrating)
+            # app.logger.info("WOOHOO")
+            # app.logger.info(newrating)
             raise MethodNotAllowed("Rating should be between 1-10")
         # app.logger.info(product.deserialize(request.get_json()))
         # product.deserialize(request.get_json())
