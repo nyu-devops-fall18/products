@@ -61,7 +61,7 @@ product_model = api.model('Product', {'id': fields.Integer(required=True, descri
                       'inventory': fields.Integer(required=True, description='The inventory of the product'),
                       'review': fields.String(required=False, description='The review of the product'),
                       'rating': fields.Integer(required=True, description='The rating of the product'),
-                      'hitCount': fields.Integer(required=True, description='The number of times product has been rated'),
+                      'hitCount': fields.Integer(required=False, description='The number of times product has been rated'),
                       'updatedDate': fields.String(required=False, description="Last updated date of product")
                      })
 
@@ -81,7 +81,7 @@ product_arguments2.add_argument('rating', type=int, required=True)
 
 product_arguments3 = reqparse.RequestParser()
 product_arguments3.add_argument('id', type=int, required=True)
-product_arguments3.add_argument('rev', type=int, required=True)
+product_arguments3.add_argument('rev', type=str, required=True)
 
 ns = api.namespace("products", description="Products API")
 
@@ -91,42 +91,49 @@ ns = api.namespace("products", description="Products API")
 @app.errorhandler(ValidationError)
 def request_validation_error(error):
     """ Handles Value Errors from bad data """
-    return bad_request(error)
-
-@app.errorhandler(400)
-def bad_request(error):
-    """ Handles bad reuests with 400_BAD_REQUEST """
+    # return bad_request(error)
     message = error.message or str(error)
     app.logger.info(message)
-    return jsonify(status=400, error='Bad Request', message=message), 400
+    return {
+        'status_code': status.HTTP_400_BAD_REQUEST,
+        'error': 'Bad Request',
+        'message': message
+    }, status.HTTP_400_BAD_REQUEST
 
-@app.errorhandler(404)
-def not_found(error):
-    """ Handles resources not found with 404_NOT_FOUND """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=404, error='Not Found', message=message), 404
+# @app.errorhandler(400)
+# def bad_request(error):
+#     """ Handles bad reuests with 400_BAD_REQUEST """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=400, error='Bad Request', message=message), 400
 
-@app.errorhandler(405)
-def method_not_supported(error):
-    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=405, error='Method not Allowed', message=message), 405
+# @app.errorhandler(404)
+# def not_found(error):
+#     """ Handles resources not found with 404_NOT_FOUND """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=404, error='Not Found', message=message), 404
 
-@app.errorhandler(415)
-def mediatype_not_supported(error):
-    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=415, error='Unsupported media type', message=message), 415
+# @app.errorhandler(405)
+# def method_not_supported(error):
+#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=405, error='Method not Allowed', message=message), 405
 
-@app.errorhandler(500)
-def internal_server_error(error):
-    """ Handles unexpected server error with 500_SERVER_ERROR """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=500, error='Internal Server Error', message=message), 500
+# @app.errorhandler(415)
+# def mediatype_not_supported(error):
+#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=415, error='Unsupported media type', message=message), 415
+
+# @app.errorhandler(500)
+# def internal_server_error(error):
+#     """ Handles unexpected server error with 500_SERVER_ERROR """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=500, error='Internal Server Error', message=message), 500
 
 # @app.route('/products', methods=['GET'])
 @api.route('/products', strict_slashes=False)
@@ -167,8 +174,8 @@ class ProductCollection(Resource):
     #########################
     @api.doc('create_products')
     @api.expect(product_model)
-    @api.response(400,"Validation Error")
     @api.response(201,"Success")
+    @api.response(400,"Validation Error")
     @api.marshal_with(product_model, code=201)
     def post(self):
         """
@@ -197,6 +204,7 @@ class ProductResource(Resource):
     #########################
     # @app.route('/products/<int:item_id>', methods=["GET"])
     @api.doc('list_products')
+    @api.response(200, "Success")
     @api.response(404, "Product Not Found")
     @api.marshal_with(product_model)
     def get(self,item_id):
@@ -218,8 +226,8 @@ class ProductResource(Resource):
     # @api.route("/products/<int:item_id>", )
     @api.doc('update_products')
     @api.expect(product_model)
-    @api.response(404, "Product Not Found")
     @api.response(400, "Validation Error")
+    @api.response(404, "Product Not Found")
     @api.marshal_with(product_model)
     def put(self,item_id):
         app.logger.info("Fetching the product")
@@ -288,10 +296,10 @@ class ProductPrice(Resource):
     def get(self):
         app.logger.info("Fetching products by provided price range")
         # app.logger.info(request.args.get('minimum'))
-        # minimum = request.args.get('minimum')
-        # maximum = request.args.get('maximum')
-        minimum = int((product_arguments.parse_args())['minimum'])
-        maximum = int ((product_arguments.parse_args())['maximum'])
+        minimum = request.args.get('minimum')
+        maximum = request.args.get('maximum')
+        # minimum = int((product_arguments.parse_args())['minimum'])
+        # maximum = int ((product_arguments.parse_args())['maximum'])
         tlist = list(Product.search_by_price(minimum,maximum))
         result = []
         for i in tlist:
@@ -316,13 +324,14 @@ class ProductRating(Resource):
     @api.response(404,"Product Not Found")
     def put(self):
         app.logger.info("Fetching the product")
-        # item = request.args.get("id")
+        item = request.args.get("id")
         # check_content_type("application/json")
-        item = int((product_arguments2.parse_args())['id'])
-        newrating = int ((product_arguments2.parse_args())['rating'])
+        # item = (product_arguments2.parse_args())['id']
+        app.logger.info(item)
+        # newrating = int ((product_arguments2.parse_args())['rating'])
         product = Product.find_by_id(item)
-        # newrating = request.args.get('stars')
-        # print(newrating)
+        newrating = request.args.get('stars')
+        print(newrating)
         if not product:
             api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
             # raise NotFound("Product with id {} not found".format(item))
@@ -352,11 +361,12 @@ class ProductReview(Resource):
     @api.response(404,"Product Not Found")
     def put(self, ):
         app.logger.info("Fetching the product")
-        # item_id = request.args.get("id")
-        item = int((product_arguments3.parse_args())['id'])
+        item = request.args.get("id")
+        # item = int((product_arguments3.parse_args())['id'])
         check_content_type("application/json")
-        product = Product.find_by_id(item_id)
-        newreview =  str ((product_arguments2.parse_args())['rev'])
+        product = Product.find_by_id(item)
+        newreview = request.args.get('newrev')
+        # newreview =  str ((product_arguments2.parse_args())['rev'])
         print(newreview)
         if not product:
             api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
