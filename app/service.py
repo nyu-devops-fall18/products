@@ -77,11 +77,11 @@ product_arguments1.add_argument('category', type=str, required = False)
 
 product_arguments2 = reqparse.RequestParser()
 product_arguments2.add_argument('id', type=int, required=True)
-product_arguments2.add_argument('rating', type=int, required=True)
+product_arguments2.add_argument('stars', type=int, required=True)
 
 product_arguments3 = reqparse.RequestParser()
 product_arguments3.add_argument('id', type=int, required=True)
-product_arguments3.add_argument('rev', type=str, required=True)
+product_arguments3.add_argument('newrev', type=str, required=True)
 
 ns = api.namespace("products", description="Products API")
 
