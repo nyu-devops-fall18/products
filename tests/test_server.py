@@ -207,6 +207,19 @@ class TestProductServer(unittest.TestCase):
         # new_count = self.get_product_count()
         # self.assertEqual(new_count, 0)
 
+    def test_query_product_list_by_name(self):
+        """ Query Products by Name """
+        resp = self.app.get('/products',
+                            query_string='name=Rome Chair')
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertGreater(len(resp.data), 0)
+        self.assertIn("Chair", resp.data)
+        self.assertNotIn('Table', resp.data)
+        data = json.loads(resp.data)
+        query_item = data[0]
+        self.assertEqual(query_item['name'], 'Rome Chair')
+
+
     def test_query_product_list_by_category(self):
         """ Query Products by Category """
         resp = self.app.get('/products',
@@ -235,12 +248,12 @@ class TestProductServer(unittest.TestCase):
         resp = self.app.put('/products')
         self.assertEqual(resp.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
-    @patch('app.service.Product.find_by_name')
-    def test_bad_request(self, bad_request_mock):
-        """ Test a Bad Request error from Find By Name """
-        bad_request_mock.side_effect = ValidationError()
-        resp = self.app.get('/products', query_string='name=Rome Chair')
-        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+    # @patch('app.service.Product.find_by_name')
+    # def test_bad_request(self, bad_request_mock):
+    #     """ Test a Bad Request error from Find By Name """
+    #     bad_request_mock.side_effect = ValidationError()
+    #     resp = self.app.get('/products', query_string='name=Rome Chair')
+    #     self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
     @patch('app.service.Product.update')
     def test_bad_request_header(self, invalid_header_mock):

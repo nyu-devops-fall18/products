@@ -271,7 +271,7 @@ class ProductSort(Resource):
     # Sort products by date
     #########################
     @api.doc('sort_products')
-    @api.marshal_list_with(product_model)
+    # @api.marshal_list_with(product_model)
     def get(self):
         """List all the product by their updated date"""
         app.logger.info("List products by updated date")
