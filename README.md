@@ -5,7 +5,7 @@
 # Service Descriptions and Endpoints 
 The products resource represents the store items that the customer can perform the following operations:
 * List All products: the mainpage /products
-* List products by ID: /products?id=<int:id>
+* List products by ID: /products/<int:id>
 * List products by date: list up all the products in a descending order
 * List products by category: /products?category=<str:category>
 * List products by name: /products?name=<str:name>
