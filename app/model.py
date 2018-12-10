@@ -76,7 +76,9 @@ class Product(db.Model):
         if not isinstance(productdata, dict):
             raise ValidationError('Invalid product: body of request contained bad or no data')
         try:
-            # if productdata['name'] or productdata['description'] or productdata['category'] or product
+            if not(productdata['name'] or productdata['description'] or productdata['category'] or productdata['price']
+            or productdata['condition'] or productdata['inventory'] or productdata['review'] or productdata['rating']):
+                raise ValidationError('Field cannot be None')
             self.name = productdata['name']
             self.description = productdata['description']
             self.category = productdata['category']

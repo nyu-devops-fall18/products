@@ -185,7 +185,10 @@ class ProductCollection(Resource):
         check_content_type('application/json')
         product = Product(1,"","","",0,"",0,"",0)
         # product = Product()
-        product.deserialize(api.payload)
+        try:
+            product.deserialize(api.payload)
+        except ValidationError as e:
+            return MethodNotAllowed("Invalid data passed", status.HTTP_400_BAD_REQUEST)
         product.save()
         message = product.serialize()
         location_url = api.url_for(ProductCollection, item_id=product.id, _external=True)
@@ -223,6 +226,8 @@ class ProductResource(Resource):
     def get(self,item_id):
         """ Finds a product by ID"""
         app.logger.info('Finding a Product with id [{}]'.format(item_id))
+        if not isinstance(item_id, int):
+            raise MethodNotAllowed("Invalid Product ID")
         product = Product.find_by_id(item_id)
         if product:
             return product.serialize(), status.HTTP_200_OK
