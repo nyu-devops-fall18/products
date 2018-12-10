@@ -2,7 +2,7 @@ import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
-# from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, MethodNotAllowed
 from app.model import Product, ValidationError
 from flask_restplus import Api, Resource, fields, reqparse, abort
 from . import app
@@ -87,47 +87,48 @@ ns = api.namespace("products", description="Products API")
 
 #########################
 # error handlers
-#########################
+# #########################
+
 @app.errorhandler(ValidationError)
 def request_validation_error(error):
     """ Handles Value Errors from bad data """
     # return bad_request(error)
-    message = error.message or str(error)
-    app.logger.info(message)
+    message = str(error)
+    # app.logger.info(message)
     return {
         'status_code': status.HTTP_400_BAD_REQUEST,
         'error': 'Bad Request',
         'message': message
     }, status.HTTP_400_BAD_REQUEST
-
+#
 # @app.errorhandler(400)
 # def bad_request(error):
 #     """ Handles bad reuests with 400_BAD_REQUEST """
 #     message = error.message or str(error)
 #     app.logger.info(message)
 #     return jsonify(status=400, error='Bad Request', message=message), 400
-
+#
 # @app.errorhandler(404)
 # def not_found(error):
 #     """ Handles resources not found with 404_NOT_FOUND """
 #     message = error.message or str(error)
 #     app.logger.info(message)
 #     return jsonify(status=404, error='Not Found', message=message), 404
-
+#
 # @app.errorhandler(405)
 # def method_not_supported(error):
 #     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-#     message = error.message or str(error)
+#     message = str(error) or error.message
 #     app.logger.info(message)
 #     return jsonify(status=405, error='Method not Allowed', message=message), 405
-
+#
 # @app.errorhandler(415)
 # def mediatype_not_supported(error):
 #     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
 #     message = error.message or str(error)
 #     app.logger.info(message)
 #     return jsonify(status=415, error='Unsupported media type', message=message), 415
-
+#
 # @app.errorhandler(500)
 # def internal_server_error(error):
 #     """ Handles unexpected server error with 500_SERVER_ERROR """
@@ -150,12 +151,13 @@ class ProductCollection(Resource):
     def get(self):
          """ Return all the products"""
          products = []
-         # id = (product_arguments1.parse_args())['id']
-         name = (product_arguments1.parse_args())['name']
-         category = (product_arguments1.parse_args())['category']
-         # name = request.args.get('name')
-         app.logger.info(name)
-         # category = request.args.get('category')
+         # # id = (product_arguments1.parse_args())['id']
+         # name = (product_arguments1.parse_args())['name']
+         # category = (product_arguments1.parse_args())['category']
+         name = request.args.get('name')
+         # app.logger.info(name)
+         category = request.args.get('category')
+         # app.logger.info(category)
          # id = request.args.get("id")
          if name:
              products = Product.find_by_name(name)
@@ -182,17 +184,34 @@ class ProductCollection(Resource):
         Creates a Product
         This endpoint will create a Product based the data in the body that is posted
         """
-        check_content_type('application/json')
-        product = Product(1,"","","",0,"",0,"",0)
-        product.deserialize(api.payload)
-        product.save()
-        message = product.serialize()
-        location_url = api.url_for(ProductCollection, item_id=product.id, _external=True)
-        # return make_response(jsonify(message), status.HTTP_201_CREATED,
-        #                      {
-        #                          'Location': location_url
-        #                      })
-        return product.serialize(),status.HTTP_201_CREATED,{'Location':location_url }
+        try:
+            check_content_type('application/json')
+            product = Product(1,"","","",0,"",0,"",0)
+            # product = Product()
+            # app.logger.info((api.payload))
+            product.deserialize(api.payload)
+            product.save()
+            message = product.serialize()
+            location_url = api.url_for(ProductCollection, item_id=product.id, _external=True)
+            # return make_response(jsonify(message), status.HTTP_201_CREATED,
+            #                      {
+            #                          'Location': location_url
+            #                      })
+            return product.serialize(),status.HTTP_201_CREATED,{'Location':location_url }
+        except ValidationError:
+            return request_validation_error('Invalid Data')
+
+    #########################
+    # delete all products
+    #########################
+
+    @api.doc("deleteallproducts")
+    # @app.route("/products", methods=["DELETE"])
+    def delete(self):
+        """ Deletes all the products"""
+        app.logger.info("Deleting all products")
+        Product.delete_all()
+        return make_response(" ", status.HTTP_204_NO_CONTENT)
 
 
 @api.route('/products/<int:item_id>')
@@ -206,19 +225,22 @@ class ProductResource(Resource):
     @api.doc('list_products')
     @api.response(200, "Success")
     @api.response(404, "Product Not Found")
-    @api.marshal_with(product_model)
+    # @api.marshal_with(product_model)
     def get(self,item_id):
+        """ Finds a product by ID"""
         app.logger.info('Finding a Product with id [{}]'.format(item_id))
+        if not isinstance(item_id, int):
+            return request_validation_error("Invalid Product ID")
         product = Product.find_by_id(item_id)
         if product:
-            message = product.serialize()
-            return_code = status.HTTP_200_OK
+            # app.logger.info(product)
+            return product.serialize(), status.HTTP_200_OK
         else:
             # message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
-            # raise NotFound(message)
-            # return_code = status.HTTP_404_NOT_FOUND
-        return message, return_code
+            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
+            return make_response('Product with id {} was not found'.format(item_id), status.HTTP_404_NOT_FOUND)
+            # return_code = status.HTTP_404_NotFound
+        # return message, return_code
 
     #########################
     # update product by ID
@@ -228,25 +250,29 @@ class ProductResource(Resource):
     @api.expect(product_model)
     @api.response(400, "Validation Error")
     @api.response(404, "Product Not Found")
-    @api.marshal_with(product_model)
+    # @api.marshal_with(product_model)
     def put(self,item_id):
-        app.logger.info("Fetching the product")
-        check_content_type("application/json")
-        product = Product.find_by_id(item_id)
-        # app.logger.info(product.rating)
-        # prevrating = product.rating
-        if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
-            # raise NotFound("Product with id {} not found".format(item_id))
-        # app.logger.info(product.deserialize(request.get_json()))
-        hitcount = product.updateCount
-        product.deserialize(api.payload)
-        product.id = item_id
-        # app.logger.info(product.rating)
-        product.rating = product.totalrating/(hitcount+1)
-        product.update()
-        # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
-        return product.serialize(),status.HTTP_200_OK
+        """ Updates a product by ID"""
+        try:
+            app.logger.info("Fetching the product")
+            check_content_type("application/json")
+            product = Product.find_by_id(item_id)
+            # app.logger.info(product.rating)
+            # prevrating = product.rating
+            if not product:
+                # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
+                return make_response("Product with id {} not found".format(item_id),status.HTTP_404_NOT_FOUND)
+            # app.logger.info(product.deserialize(request.get_json()))
+            hitcount = product.updateCount
+            product.deserialize(api.payload)
+            product.id = item_id
+            # app.logger.info(product.rating)
+            product.rating = product.totalrating/(hitcount+1)
+            product.update()
+            # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
+            return product.serialize(),status.HTTP_200_OK
+        except ValidationError:
+            return request_validation_error('Invalid data provided')
 
     #########################
     # delete product by ID
@@ -254,6 +280,7 @@ class ProductResource(Resource):
     @api.doc('delete_products')
     @api.response(204, "Product Deleted")
     def delete(self,item_id):
+        """ Deletes a product by ID"""
         app.logger.info("Deleting the product for the id provided")
         product = Product.find_by_id(item_id)
         # if not product:
@@ -294,6 +321,7 @@ class ProductPrice(Resource):
     @api.expect(product_arguments)
     @api.marshal_list_with(product_model)
     def get(self):
+        """List all the product by their price range"""
         app.logger.info("Fetching products by provided price range")
         # app.logger.info(request.args.get('minimum'))
         minimum = request.args.get('minimum')
@@ -323,28 +351,40 @@ class ProductRating(Resource):
     @api.marshal_with(product_model)
     @api.response(404,"Product Not Found")
     def put(self):
-        app.logger.info("Fetching the product")
-        item = request.args.get("id")
-        # check_content_type("application/json")
-        # item = (product_arguments2.parse_args())['id']
-        app.logger.info(item)
-        # newrating = int ((product_arguments2.parse_args())['rating'])
-        product = Product.find_by_id(item)
-        newrating = request.args.get('stars')
-        print(newrating)
-        if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
-            # raise NotFound("Product with id {} not found".format(item))
-        # app.logger.info(product.deserialize(request.get_json()))
-        # product.deserialize(request.get_json())
-        # product.id = item_id
-        # app.logger.info(product.rating)
-        product.totalrating += int(newrating)
-        # product.updateCount += 1
-        product.rating = (int(product.totalrating)/(product.updateCount + 1))
-        product.update()
-        # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
-        return product.serialize(),status.HTTP_200_OK
+        try:
+            """Updates product rating with rating provided as stars"""
+            app.logger.info("Fetching the product")
+            item = request.args.get("id")
+            # check_content_type("application/json")
+            # item = (product_arguments2.parse_args())['id']
+            app.logger.info(item)
+            # newrating = int ((product_arguments2.parse_args())['rating'])
+            product = Product.find_by_id(item)
+            newrating = request.args.get('stars')
+            print(newrating)
+            if not product:
+                # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
+                return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
+            elif newrating == '' or newrating is None:
+                return request_validation_error("Rating cannot be empty")
+            elif not isinstance(int(newrating), int):
+                return request_validation_error('Rating is a number')
+            elif int(newrating) > 10 or int(newrating) < 1:
+                # app.logger.info("WOOHOO")
+                # app.logger.info(newrating)
+                return request_validation_error("Rating should be between 1-10")
+            # app.logger.info(product.deserialize(request.get_json()))
+            # product.deserialize(request.get_json())
+            # product.id = item_id
+            # app.logger.info(product.rating)
+            product.totalrating += int(newrating)
+            # product.updateCount += 1
+            product.rating = (int(product.totalrating)/(product.updateCount + 1))
+            product.update()
+            # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
+            return product.serialize(),status.HTTP_200_OK
+        except:
+            return request_validation_error('Invalid request')
 
 
 @api.route("/products/review")
@@ -357,9 +397,10 @@ class ProductReview(Resource):
     # @app.route("/products/review", methods=["PUT"])
     @api.doc('update_product_review')
     @api.expect(product_arguments3)
-    @api.marshal_with(product_model)
+    # @api.marshal_with(product_model)
     @api.response(404,"Product Not Found")
     def put(self, ):
+        """Updates product review with review provided as newrev"""
         app.logger.info("Fetching the product")
         item = request.args.get("id")
         # item = int((product_arguments3.parse_args())['id'])
@@ -369,25 +410,21 @@ class ProductReview(Resource):
         # newreview =  str ((product_arguments2.parse_args())['rev'])
         print(newreview)
         if not product:
-            api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
-        if not product.review:
-             product.review = str(newreview)
+            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
+            return make_response("Product with id {} not found".format(item),status.HTTP_404_NOT_FOUND)
+        if newreview == '' or newreview is None:
+            return request_validation_error("Review should be an empty string atleast")
+        elif not product.review:
+            print(newreview)
+            product.review = str(newreview)
         else:
             product.review = str(product.review) + "|" + str(newreview)
-        product.update()
+            print(product.review)
+            product.update()
+        return product.serialize(), status.HTTP_200_OK
 
         # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
-        return product.serialize(),status.HTTP_200_OK
 
-
-#########################
-# delete all products
-#########################
-@app.route("/products", methods=["DELETE"])
-def deleteallproducts():
-    app.logger.info("Deleting all products")
-    Product.delete_all()
-    return make_response(" ", status.HTTP_204_NO_CONTENT)
 
 def check_content_type(content_type):
     """ Checks that the media type is correct """

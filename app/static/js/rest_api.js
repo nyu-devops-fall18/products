@@ -284,41 +284,41 @@ $(function() {
         var queryString = ""
 
         if (name) {
-            queryString += 'name=' + name
+            queryString += '?name=' + name
         }
         if (description) {
-            queryString += 'description=' + description
+            queryString += '?description=' + description
         }
         if (category) {
             if (queryString.length > 0) {
                 queryString += '&category=' + category
             } else {
-                queryString += 'category=' + category
+                queryString += '?category=' + category
             }
         }
         if (price) {
-            queryString += 'price=' + price
+            queryString += '?price=' + price
         }
         if (condition) {
-            queryString += 'condition=' + condition
+            queryString += '?condition=' + condition
         }
         if (inventory) {
-            queryString += 'inventory=' + inventory
+            queryString += '?inventory=' + inventory
         }
         if (review) {
             if (queryString.length > 0) {
                 queryString += '&review=' + review
             } else {
-                queryString += 'review=' + review
+                queryString += '?review=' + review
             }
         }
         if (rating) {
-            queryString += 'rating=' + rating
+            queryString += '?rating=' + rating
         }
 
         var ajax = $.ajax({
             type: "GET",
-            url: "/products?" + queryString,
+            url: "/products" + queryString,
             contentType:"application/json",
             data: ''
         })

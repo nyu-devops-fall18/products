@@ -2,9 +2,11 @@ import logging
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from datetime import datetime
+from flask import make_response
 # import ibm_db
 # db = SQLAlchemy()
 from . import db
+from flask_api import status
 
 class ValidationError (ValueError):
     pass
@@ -15,14 +17,14 @@ class Product(db.Model):
     app = None
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(63))
-    description = db.Column(db.String(511))
-    category = db.Column(db.String(63))
-    price = db.Column(db.Integer)
-    condition = db.Column(db.String(63))
-    inventory = db.Column(db.Integer)
-    review = db.Column(db.String(511))
-    rating = db.Column(db.Integer)
+    name = db.Column(db.String(63), nullable=False)
+    description = db.Column(db.String(511), nullable=False)
+    category = db.Column(db.String(63), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
+    condition = db.Column(db.String(63), nullable=False)
+    inventory = db.Column(db.Integer, nullable=False)
+    review = db.Column(db.String(511), nullable=False)
+    rating = db.Column(db.Integer, nullable=False)
     updateddate = db.Column(db.String(63))
     updateCount = db.Column(db.Integer)
     totalrating = db.Column(db.Integer)
@@ -76,6 +78,14 @@ class Product(db.Model):
         if not isinstance(productdata, dict):
             raise ValidationError('Invalid product: body of request contained bad or no data')
         try:
+            if not(productdata['name'] or productdata['description'] or productdata['category'] or productdata['price']
+            or productdata['condition'] or productdata['inventory'] or productdata['review'] or productdata['rating']):
+                raise ValidationError('Field cannot be None')
+
+            for i in productdata.values():
+                if(i == ''):
+                    raise ValidationError('Field cannot be empty string')
+                # return make_response("Fields cannot be None", status.HTTP_400_BAD_REQUEST)
             self.name = productdata['name']
             self.description = productdata['description']
             self.category = productdata['category']
