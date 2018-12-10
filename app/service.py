@@ -402,6 +402,8 @@ class ProductReview(Resource):
         item = request.args.get("id")
         # item = int((product_arguments3.parse_args())['id'])
         check_content_type("application/json")
+        if not item:
+            return request_validation_error("Missing Parameter product ID")
         product = Product.find_by_id(item)
         newreview = request.args.get('newrev')
         # newreview =  str ((product_arguments2.parse_args())['rev'])
