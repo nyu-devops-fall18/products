@@ -94,7 +94,7 @@ def request_validation_error(error):
     """ Handles Value Errors from bad data """
     # return bad_request(error)
     message = str(error)
-    app.logger.info(message)
+    # app.logger.info(message)
     return {
         'status_code': status.HTTP_400_BAD_REQUEST,
         'error': 'Bad Request',
@@ -155,8 +155,9 @@ class ProductCollection(Resource):
          # name = (product_arguments1.parse_args())['name']
          # category = (product_arguments1.parse_args())['category']
          name = request.args.get('name')
-         app.logger.info(name)
+         # app.logger.info(name)
          category = request.args.get('category')
+         # app.logger.info(category)
          # id = request.args.get("id")
          if name:
              products = Product.find_by_name(name)
@@ -365,10 +366,12 @@ class ProductRating(Resource):
             return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
         elif newrating == '' or newrating is None:
             return request_validation_error("Rating cannot be empty")
+        elif not isinstance(int(newrating), int):
+            return request_validation_error('Rating is a number')
         elif int(newrating) > 10 or int(newrating) < 1:
             # app.logger.info("WOOHOO")
             # app.logger.info(newrating)
-            return make_response("Rating should be between 1-10", status.HTTP_400_BAD_REQUEST)
+            return request_validation_error("Rating should be between 1-10")
         # app.logger.info(product.deserialize(request.get_json()))
         # product.deserialize(request.get_json())
         # product.id = item_id
