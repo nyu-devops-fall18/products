@@ -32,21 +32,23 @@ def get_database_uri():
       3) With PostgreSQL running on the local server as with Travis CI
     """
     database_uri = None
+    logging.info("Getting database for products!")
+    logging.info("In VCAP_SERVICES file")
     logging.info(os.environ)
     if 'DATABASE_URI' in os.environ:
         # Get the credentials from DATABASE_URI
-        logging.info("Using DATABASE_URI...")
+        # logging.info("Using DATABASE_URI...")
         database_uri = os.environ['DATABASE_URI']
 
     elif 'VCAP_SERVICES' in os.environ:
         # Get the credentials from the Bluemix environment
-        logging.info("Using VCAP_SERVICES...")
+        # logging.info("Using VCAP_SERVICES...")
         vcap_services = os.environ['VCAP_SERVICES']
         services = json.loads(vcap_services)
         creds = services['dashDB For Transactions'][0]['credentials']
         database_uri = creds["uri"]
     else:
-        logging.info("Using localhost database...")
+        # logging.info("Using localhost database...")
         database_uri = "postgres://postgres:postgres@localhost:5432/postgres"
     logging.info(database_uri)
     return database_uri

@@ -2,7 +2,7 @@ import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, MethodNotAllowed
 from app.model import Product, ValidationError
 from flask_restplus import Api, Resource, fields, reqparse, abort
 from . import app
@@ -87,53 +87,53 @@ ns = api.namespace("products", description="Products API")
 
 #########################
 # error handlers
-#########################
-@app.errorhandler(ValidationError)
-def request_validation_error(error):
-    """ Handles Value Errors from bad data """
-    # return bad_request(error)
-    message = error.message or str(error)
-    app.logger.info(message)
-    return {
-        'status_code': status.HTTP_400_BAD_REQUEST,
-        'error': 'Bad Request',
-        'message': message
-    }, status.HTTP_400_BAD_REQUEST
-
-@app.errorhandler(400)
-def bad_request(error):
-    """ Handles bad reuests with 400_BAD_REQUEST """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=400, error='Bad Request', message=message), 400
-
-@app.errorhandler(404)
-def not_found(error):
-    """ Handles resources not found with 404_NOT_FOUND """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=404, error='Not Found', message=message), 404
-
-@app.errorhandler(405)
-def method_not_supported(error):
-    """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-    message = str(error) or error.message
-    app.logger.info(message)
-    return jsonify(status=405, error='Method not Allowed', message=message), 405
-
-@app.errorhandler(415)
-def mediatype_not_supported(error):
-    """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=415, error='Unsupported media type', message=message), 415
-
-@app.errorhandler(500)
-def internal_server_error(error):
-    """ Handles unexpected server error with 500_SERVER_ERROR """
-    message = error.message or str(error)
-    app.logger.info(message)
-    return jsonify(status=500, error='Internal Server Error', message=message), 500
+# #########################
+# @app.errorhandler(ValidationError)
+# def request_validation_error(error):
+#     """ Handles Value Errors from bad data """
+#     # return bad_request(error)
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return {
+#         'status_code': status.HTTP_400_BAD_REQUEST,
+#         'error': 'Bad Request',
+#         'message': message
+#     }, status.HTTP_400_BAD_REQUEST
+#
+# @app.errorhandler(400)
+# def bad_request(error):
+#     """ Handles bad reuests with 400_BAD_REQUEST """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=400, error='Bad Request', message=message), 400
+#
+# @app.errorhandler(404)
+# def not_found(error):
+#     """ Handles resources not found with 404_NOT_FOUND """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=404, error='Not Found', message=message), 404
+#
+# @app.errorhandler(405)
+# def method_not_supported(error):
+#     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
+#     message = str(error) or error.message
+#     app.logger.info(message)
+#     return jsonify(status=405, error='Method not Allowed', message=message), 405
+#
+# @app.errorhandler(415)
+# def mediatype_not_supported(error):
+#     """ Handles unsuppoted media requests with 415_UNSUPPORTED_MEDIA_TYPE """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=415, error='Unsupported media type', message=message), 415
+#
+# @app.errorhandler(500)
+# def internal_server_error(error):
+#     """ Handles unexpected server error with 500_SERVER_ERROR """
+#     message = error.message or str(error)
+#     app.logger.info(message)
+#     return jsonify(status=500, error='Internal Server Error', message=message), 500
 
 # @app.route('/products', methods=['GET'])
 @api.route('/products', strict_slashes=False)
@@ -352,8 +352,10 @@ class ProductRating(Resource):
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
             raise NotFound("Product with id {} not found".format(item))
-        if newrating > 10 or newrating < 1:
-            raise method_not_supported("Rating should be between 1-10")
+        elif int(newrating) > 10 or int(newrating) < 1:
+            app.logger.info("WOOHOO")
+            app.logger.info(newrating)
+            raise MethodNotAllowed("Rating should be between 1-10")
         # app.logger.info(product.deserialize(request.get_json()))
         # product.deserialize(request.get_json())
         # product.id = item_id
@@ -394,7 +396,7 @@ class ProductReview(Resource):
         if not product.review:
              product.review = str(newreview)
         elif not newreview:
-            return method_not_supported("Review should be an empty string atleast")
+            return MethodNotAllowed("Review should be an empty string atleast")
         else:
             product.review = str(product.review) + "|" + str(newreview)
         product.update()
