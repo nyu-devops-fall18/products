@@ -2,7 +2,7 @@ import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
-# from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound
 from app.model import Product, ValidationError
 from flask_restplus import Api, Resource, fields, reqparse, abort
 from . import app
@@ -117,7 +117,7 @@ def not_found(error):
 @app.errorhandler(405)
 def method_not_supported(error):
     """ Handles unsuppoted HTTP methods with 405_METHOD_NOT_SUPPORTED """
-    message = error.message or str(error)
+    message = str(error) or error.message
     app.logger.info(message)
     return jsonify(status=405, error='Method not Allowed', message=message), 405
 
@@ -183,8 +183,8 @@ class ProductCollection(Resource):
         This endpoint will create a Product based the data in the body that is posted
         """
         check_content_type('application/json')
-        # product = Product(1,"","","",0,"",0,"",0)
-        product = Product()
+        product = Product(1,"","","",0,"",0,"",0)
+        # product = Product()
         product.deserialize(api.payload)
         product.save()
         message = product.serialize()
@@ -225,14 +225,13 @@ class ProductResource(Resource):
         app.logger.info('Finding a Product with id [{}]'.format(item_id))
         product = Product.find_by_id(item_id)
         if product:
-            message = product.serialize()
-            return_code = status.HTTP_200_OK
+            return product.serialize(), status.HTTP_200_OK
         else:
-            message = {'error' : 'Product with id: %s was not found' % str(item_id)}
-            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
-            raise not_found(message)
-            # return_code = status.HTTP_404_NOT_FOUND
-        return message, return_code
+            # message = {'error' : 'Product with id: %s was not found' % str(item_id)}
+            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
+            raise NotFound('Product with id {} was not found'.format(item_id))
+            # return_code = status.HTTP_404_NotFound
+        # return message, return_code
 
     #########################
     # update product by ID
@@ -251,8 +250,8 @@ class ProductResource(Resource):
         # app.logger.info(product.rating)
         # prevrating = product.rating
         if not product:
-            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item_id))
-            raise not_found("Product with id {} not found".format(item_id))
+            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
+            raise NotFound("Product with id {} not found".format(item_id))
         # app.logger.info(product.deserialize(request.get_json()))
         hitcount = product.updateCount
         product.deserialize(api.payload)
@@ -351,8 +350,8 @@ class ProductRating(Resource):
         newrating = request.args.get('stars')
         print(newrating)
         if not product:
-            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
-            raise not_found("Product with id {} not found".format(item))
+            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
+            raise NotFound("Product with id {} not found".format(item))
         if newrating > 10 or newrating < 1:
             raise method_not_supported("Rating should be between 1-10")
         # app.logger.info(product.deserialize(request.get_json()))
@@ -390,11 +389,11 @@ class ProductReview(Resource):
         # newreview =  str ((product_arguments2.parse_args())['rev'])
         print(newreview)
         if not product:
-            # api.abort(status.HTTP_404_NOT_FOUND,'Product with id: %s was not found' % str(item))
-            return not_found("Product with id {} not found".format(item))
+            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
+            return NotFound("Product with id {} not found".format(item))
         if not product.review:
              product.review = str(newreview)
-        if not newreview:
+        elif not newreview:
             return method_not_supported("Review should be an empty string atleast")
         else:
             product.review = str(product.review) + "|" + str(newreview)
