@@ -150,12 +150,12 @@ class ProductCollection(Resource):
     def get(self):
          """ Return all the products"""
          products = []
-         # id = (product_arguments1.parse_args())['id']
-         name = (product_arguments1.parse_args())['name']
-         category = (product_arguments1.parse_args())['category']
-         # name = request.args.get('name')
+         # # id = (product_arguments1.parse_args())['id']
+         # name = (product_arguments1.parse_args())['name']
+         # category = (product_arguments1.parse_args())['category']
+         name = request.args.get('name')
          app.logger.info(name)
-         # category = request.args.get('category')
+         category = request.args.get('category')
          # id = request.args.get("id")
          if name:
              products = Product.find_by_name(name)
