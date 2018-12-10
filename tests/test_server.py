@@ -123,7 +123,7 @@ class TestProductServer(unittest.TestCase):
         # save the current number of products for later comparison
         product_count = self.get_product_count()
         # add a new product
-        new_product = dict(id=3, name='Greek Table', description='Its a Table', category="Table", price=12, condition="Boxed", inventory=2, review="", rating=2)
+        new_product = dict(id=3, name='Greek Table', description='Its a Table', category="Table", price=12, condition="Boxed", inventory=2, review="Amazing", rating=2)
         data = json.dumps(new_product)
         resp = self.app.post('/products',
                              data=data,
@@ -146,7 +146,7 @@ class TestProductServer(unittest.TestCase):
     def test_update_product(self):
         """ Update an existing Product """
         product = Product.find_by_name('Athens Table')[0]
-        new_product = dict(id=1,name='Athens Table', description='Stupid Table', category="Fancy Table",price=20, condition="Boxed", inventory=2, review="", rating=8)
+        new_product = dict(id=1,name='Athens Table', description='Stupid Table', category="Fancy Table",price=20, condition="Boxed", inventory=2, review="So so", rating=8)
         data = json.dumps(new_product)
         resp = self.app.put('/products/{}'.format(product.id),
                             data=data,
