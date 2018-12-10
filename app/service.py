@@ -222,14 +222,15 @@ class ProductResource(Resource):
     @api.doc('list_products')
     @api.response(200, "Success")
     @api.response(404, "Product Not Found")
-    @api.marshal_with(product_model)
+    # @api.marshal_with(product_model)
     def get(self,item_id):
         """ Finds a product by ID"""
         app.logger.info('Finding a Product with id [{}]'.format(item_id))
         if not isinstance(item_id, int):
-            raise MethodNotAllowed("Invalid Product ID")
+            return make_response("Invalid Product ID", status.HTTP_400_BAD_REQUEST)
         product = Product.find_by_id(item_id)
         if product:
+            app.logger.info(product)
             return product.serialize(), status.HTTP_200_OK
         else:
             # message = {'error' : 'Product with id: %s was not found' % str(item_id)}
