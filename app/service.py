@@ -351,37 +351,40 @@ class ProductRating(Resource):
     @api.marshal_with(product_model)
     @api.response(404,"Product Not Found")
     def put(self):
-        """Updates product rating with rating provided as stars"""
-        app.logger.info("Fetching the product")
-        item = request.args.get("id")
-        # check_content_type("application/json")
-        # item = (product_arguments2.parse_args())['id']
-        app.logger.info(item)
-        # newrating = int ((product_arguments2.parse_args())['rating'])
-        product = Product.find_by_id(item)
-        newrating = request.args.get('stars')
-        print(newrating)
-        if not product:
-            # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
-            return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
-        elif newrating == '' or newrating is None:
-            return request_validation_error("Rating cannot be empty")
-        elif not isinstance(int(newrating), int):
-            return request_validation_error('Rating is a number')
-        elif int(newrating) > 10 or int(newrating) < 1:
-            # app.logger.info("WOOHOO")
-            # app.logger.info(newrating)
-            return request_validation_error("Rating should be between 1-10")
-        # app.logger.info(product.deserialize(request.get_json()))
-        # product.deserialize(request.get_json())
-        # product.id = item_id
-        # app.logger.info(product.rating)
-        product.totalrating += int(newrating)
-        # product.updateCount += 1
-        product.rating = (int(product.totalrating)/(product.updateCount + 1))
-        product.update()
-        # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
-        return product.serialize(),status.HTTP_200_OK
+        try:
+            """Updates product rating with rating provided as stars"""
+            app.logger.info("Fetching the product")
+            item = request.args.get("id")
+            # check_content_type("application/json")
+            # item = (product_arguments2.parse_args())['id']
+            app.logger.info(item)
+            # newrating = int ((product_arguments2.parse_args())['rating'])
+            product = Product.find_by_id(item)
+            newrating = request.args.get('stars')
+            print(newrating)
+            if not product:
+                # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
+                return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
+            elif newrating == '' or newrating is None:
+                return request_validation_error("Rating cannot be empty")
+            elif not isinstance(int(newrating), int):
+                return request_validation_error('Rating is a number')
+            elif int(newrating) > 10 or int(newrating) < 1:
+                # app.logger.info("WOOHOO")
+                # app.logger.info(newrating)
+                return request_validation_error("Rating should be between 1-10")
+            # app.logger.info(product.deserialize(request.get_json()))
+            # product.deserialize(request.get_json())
+            # product.id = item_id
+            # app.logger.info(product.rating)
+            product.totalrating += int(newrating)
+            # product.updateCount += 1
+            product.rating = (int(product.totalrating)/(product.updateCount + 1))
+            product.update()
+            # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
+            return product.serialize(),status.HTTP_200_OK
+        except:
+            return request_validation_error('Invalid request')
 
 
 @api.route("/products/review")
