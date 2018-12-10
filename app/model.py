@@ -2,9 +2,11 @@ import logging
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from datetime import datetime
+from flask import make_response
 # import ibm_db
 # db = SQLAlchemy()
 from . import db
+from flask_api import status
 
 class ValidationError (ValueError):
     pass
@@ -79,6 +81,7 @@ class Product(db.Model):
             if not(productdata['name'] or productdata['description'] or productdata['category'] or productdata['price']
             or productdata['condition'] or productdata['inventory'] or productdata['review'] or productdata['rating']):
                 raise ValidationError('Field cannot be None')
+                # return make_response("Fields cannot be None", status.HTTP_400_BAD_REQUEST)
             self.name = productdata['name']
             self.description = productdata['description']
             self.category = productdata['category']

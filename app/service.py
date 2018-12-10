@@ -182,13 +182,12 @@ class ProductCollection(Resource):
         Creates a Product
         This endpoint will create a Product based the data in the body that is posted
         """
+
         check_content_type('application/json')
         product = Product(1,"","","",0,"",0,"",0)
         # product = Product()
-        try:
-            product.deserialize(api.payload)
-        except ValidationError as e:
-            return make_response("Invalid data passed", status.HTTP_400_BAD_REQUEST)
+        # app.logger.info((api.payload))
+        product.deserialize(api.payload)
         product.save()
         message = product.serialize()
         location_url = api.url_for(ProductCollection, item_id=product.id, _external=True)
