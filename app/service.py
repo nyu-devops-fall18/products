@@ -188,7 +188,7 @@ class ProductCollection(Resource):
         try:
             product.deserialize(api.payload)
         except ValidationError as e:
-            return MethodNotAllowed("Invalid data passed", status.HTTP_400_BAD_REQUEST)
+            return make_response("Invalid data passed", status.HTTP_400_BAD_REQUEST)
         product.save()
         message = product.serialize()
         location_url = api.url_for(ProductCollection, item_id=product.id, _external=True)
@@ -234,7 +234,7 @@ class ProductResource(Resource):
         else:
             # message = {'error' : 'Product with id: %s was not found' % str(item_id)}
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
-            raise NotFound('Product with id {} was not found'.format(item_id))
+            raise make_response('Product with id {} was not found'.format(item_id), status.HTTP_404_NOT_FOUND)
             # return_code = status.HTTP_404_NotFound
         # return message, return_code
 
@@ -256,7 +256,7 @@ class ProductResource(Resource):
         # prevrating = product.rating
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
-            raise NotFound("Product with id {} not found".format(item_id))
+            raise make_response("Product with id {} not found".format(item_id),status.HTTP_404_NOT_FOUND)
         # app.logger.info(product.deserialize(request.get_json()))
         hitcount = product.updateCount
         product.deserialize(api.payload)
@@ -360,7 +360,7 @@ class ProductRating(Resource):
         elif int(newrating) > 10 or int(newrating) < 1:
             # app.logger.info("WOOHOO")
             # app.logger.info(newrating)
-            raise MethodNotAllowed("Rating should be between 1-10")
+            raise make_response("Rating should be between 1-10", status.HTTP_400_BAD_REQUEST)
         # app.logger.info(product.deserialize(request.get_json()))
         # product.deserialize(request.get_json())
         # product.id = item_id
@@ -397,11 +397,11 @@ class ProductReview(Resource):
         print(newreview)
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
-            return NotFound("Product with id {} not found".format(item))
+            return make_response("Product with id {} not found".format(item),status.HTTP_404_NOT_FOUND)
         if not product.review:
              product.review = str(newreview)
         elif not newreview:
-            return MethodNotAllowed("Review should be an empty string atleast")
+            return make_response("Review should be an empty string atleast",status.HTTP_400_BAD_REQUEST)
         else:
             product.review = str(product.review) + "|" + str(newreview)
             product.update()
