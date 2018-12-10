@@ -234,7 +234,7 @@ class ProductResource(Resource):
         else:
             # message = {'error' : 'Product with id: %s was not found' % str(item_id)}
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
-            raise make_response('Product with id {} was not found'.format(item_id), status.HTTP_404_NOT_FOUND)
+            return make_response('Product with id {} was not found'.format(item_id), status.HTTP_404_NOT_FOUND)
             # return_code = status.HTTP_404_NotFound
         # return message, return_code
 
@@ -356,11 +356,11 @@ class ProductRating(Resource):
         print(newrating)
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
-            raise NotFound("Product with id {} not found".format(item))
+            return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
         elif int(newrating) > 10 or int(newrating) < 1:
             # app.logger.info("WOOHOO")
             # app.logger.info(newrating)
-            raise make_response("Rating should be between 1-10", status.HTTP_400_BAD_REQUEST)
+            return make_response("Rating should be between 1-10", status.HTTP_400_BAD_REQUEST)
         # app.logger.info(product.deserialize(request.get_json()))
         # product.deserialize(request.get_json())
         # product.id = item_id
