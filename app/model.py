@@ -1,15 +1,12 @@
 import logging
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from datetime import datetime
-from flask import make_response
-# import ibm_db
-# db = SQLAlchemy()
 from . import db
-from flask_api import status
+
 
 class ValidationError (ValueError):
     pass
+
 
 class Product(db.Model):
 
@@ -29,7 +26,7 @@ class Product(db.Model):
     updateCount = db.Column(db.Integer)
     totalrating = db.Column(db.Integer)
 
-    def __init__(self,pid,pname,pdesc,pcat,pprice,pcond,pinv,prev,prat):
+    def __init__(self, pid, pname, pdesc, pcat, pprice, pcond, pinv, prev, prat):
         self.id = pid
         self.name = pname
         self.description = pdesc
@@ -44,7 +41,7 @@ class Product(db.Model):
         self.totalrating = prat
 
     def __repr__(self):
-        return '<Product %r>' % (self.name)
+        return '<Product %r>' % self.name
 
     def save(self):
         templist = list(Product.query.with_entities(Product.id).all())
@@ -62,7 +59,7 @@ class Product(db.Model):
         db.session.commit()
 
     def update(self):
-        self.updateCount+=1
+        self.updateCount += 1
         db.session.add(self)
         db.session.commit()
 
@@ -71,19 +68,21 @@ class Product(db.Model):
         db.session.commit()
 
     def serialize(self):
-        return {"id": self.id, "name": self.name, "description":self.description, "category": self.category, "price" : self.price,
-                "condition" : self.condition, "inventory": self.inventory, "review": self.review, "rating": self.rating, "updatedDate" : self.updateddate}
+        return {"id": self.id, "name": self.name, "description": self.description, "category": self.category,
+                "price": self.price, "condition": self.condition, "inventory": self.inventory,
+                "review": self.review, "rating": self.rating, "updatedDate": self.updateddate}
 
     def deserialize(self, productdata):
         if not isinstance(productdata, dict):
             raise ValidationError('Invalid product: body of request contained bad or no data')
         try:
             if not(productdata['name'] or productdata['description'] or productdata['category'] or productdata['price']
-            or productdata['condition'] or productdata['inventory'] or productdata['review'] or productdata['rating']):
+                   or productdata['condition'] or productdata['inventory'] or productdata['review']
+                   or productdata['rating']):
                 raise ValidationError('Field cannot be None')
 
             for i in productdata.values():
-                if(i == ''):
+                if i == '':
                     raise ValidationError('Field cannot be empty string')
                 # return make_response("Fields cannot be None", status.HTTP_400_BAD_REQUEST)
             self.name = productdata['name']
@@ -113,7 +112,7 @@ class Product(db.Model):
     @staticmethod
     def search_by_price(minimum, maximum):
         Product.logger.info("Searching for all products within the price range of minimum to maximum")
-        return Product.query.filter((Product.price.between(minimum,maximum)))
+        return Product.query.filter((Product.price.between(minimum, maximum)))
 
     @staticmethod
     def delete_all():

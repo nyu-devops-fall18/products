@@ -9,6 +9,7 @@ from app import service
 WAIT_SECONDS = 120
 BASE_URL = os.getenv('BASE_URL', 'http://nyu-product-service-f18.mybluemix.net')
 
+
 def before_all(context):
     """ Executed once before all tests """
     context.driver = webdriver.PhantomJS()

@@ -22,6 +22,7 @@ import os
 import json
 import logging
 
+
 def get_database_uri():
     """
     Initialized DB2 database connection

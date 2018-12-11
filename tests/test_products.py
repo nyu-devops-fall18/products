@@ -27,6 +27,7 @@ from app import app
 
 DATABASE_URI = os.getenv('DATABASE_URI', None)
 
+
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
@@ -57,7 +58,7 @@ class TestProducts(unittest.TestCase):
     def test_create_a_product(self):
         """ Create a product and assert that it exists """
         product = Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8)
-        self.assertTrue(product != None)
+        self.assertTrue(product is not None)
         self.assertEqual(product.id, 1)
         self.assertEqual(product.name, "Couch")
         self.assertEqual(product.category, "Furniture")
@@ -72,7 +73,7 @@ class TestProducts(unittest.TestCase):
         products = Product.all()
         self.assertEqual(products, [])
         product = Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8)
-        self.assertTrue(product != None)
+        self.assertTrue(product is not None)
         self.assertEqual(product.id, 1)
         product.save()
         # Assert that it was assigned an id and shows up in the database
@@ -144,7 +145,7 @@ class TestProducts(unittest.TestCase):
     def test_deserialize_a_product(self):
         """ Test deserialization of a Product """
         data = {"id": 1, "name": "Couch", "description": "White couch", "category": "Furniture", "price": 200, "condition": "Boxed", "inventory": 50, "rating": 8, "review": " "}
-        product = Product(1,"","","",0,"",0,"",0)
+        product = Product(1, "", "", "", 0, "", 0, "", 0)
         product.deserialize(data)
         self.assertIsNot(product, None)
         self.assertEqual(product.id, 1)
@@ -159,13 +160,14 @@ class TestProducts(unittest.TestCase):
     def test_deserialize_bad_data(self):
         """ Test deserialization of bad data """
         data = "this is not a dictionary"
-        product = Product(1,"","","",0,"",0,"",0)
+        product = Product(1, "", "", "", 0, "", 0, "", 0)
         self.assertRaises(ValidationError, product.deserialize, data)
 
     def test_deserialize_bad_data_missing_arg(self):
         """ Test deserialization of missing arg """
-        data = {"id": 1, "name": "Couch", "category": "Furniture", "price": 200, "condition": "Boxed", "inventory": 50, "rating": 8, "review": " "}
-        product = Product(1,"","","",0,"",0,"",0)
+        data = {"id": 1, "name": "Couch", "category": "Furniture", "price": 200, "condition": "Boxed", "inventory": 50,
+                "rating": 8, "review": " "}
+        product = Product(1, "", "", "", 0, "", 0, "", 0)
         self.assertRaises(ValidationError, product.deserialize, data)
 
     def test_find_by_id(self):
@@ -234,7 +236,7 @@ class TestProducts(unittest.TestCase):
         """ Find a Product by PriceRange """
         Product(1, "Couch", "White couch", "Furniture", 200, "Boxed", 50, " ", 8).save()
         Product(2, "Table", "Oak table", "Furniture", 150, "Boxed", 100, " ", 7).save()
-        products = Product.search_by_price(160,210)
+        products = Product.search_by_price(160, 210)
         self.assertEqual(products[0].id, 1)
         self.assertEqual(products[0].category, "Furniture")
         self.assertEqual(products[0].name, "Couch")

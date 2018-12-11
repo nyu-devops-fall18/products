@@ -16,6 +16,7 @@ BASE_URL = getenv('BASE_URL', 'http://nyu-product-service-f18.mybluemix.net')
 WAIT_SECONDS = 120
 # count = 0
 
+
 @given('the following products')
 def step_impl(context):
     """ Delete all Products and load new ones """
@@ -42,23 +43,27 @@ def step_impl(context):
         context.resp = requests.post(create_url, data=payload, headers=headers)
         expect(context.resp.status_code).to_equal(201)
 
+
 @when('I visit the "home page"')
 def step_impl(context):
     """ Make a call to the base URL """
     # context.resp = requests.delete(context.base_url + '/products')
     # expect(context.resp.status_code).to_equal(204)
     context.driver.get(context.base_url)
-    #context.driver.save_screenshot('home_page.png')
+    # context.driver.save_screenshot('home_page.png')
+
 
 @then('I should see "{message}" in the title')
 def step_impl(context, message):
     """ Check the document title for a message """
     expect(context.driver.title).to_contain(message)
 
+
 @then('I should not see "{message}"')
 def step_impl(context, message):
     error_msg = "I should not see '%s' in '%s'" % (message, context.resp.text)
     ensure(message in context.resp.text, False, error_msg)
+
 
 @when('I set the "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):
@@ -67,17 +72,21 @@ def step_impl(context, element_name, text_string):
     element.clear()
     element.send_keys(text_string)
 
+
 @when('I set the "Price" to 40')
 def step_impl(context):
     raise NotImplementedError(u'STEP: When I set the "Price" to 40')
+
 
 @when('I set the "Inventory" to 10')
 def step_impl(context):
     raise NotImplementedError(u'STEP: When I set the "Inventory" to 10')
 
+
 @when('I set the "Rating" to 8')
 def step_impl(context):
     raise NotImplementedError(u'STEP: When I set the "Rating" to 8')
+
 
 @when(u'I set the "Id" to 1')
 def step_impl(context):
@@ -91,10 +100,12 @@ def step_impl(context):
 # to get the element id of any button
 ##################################################################
 
+
 @when('I press the "{button}" button')
 def step_impl(context, button):
     button_id = button.lower() + '-btn'
     context.driver.find_element_by_id(button_id).click()
+
 
 @then('I should see "{name}" in the results')
 def step_impl(context, name):
@@ -108,11 +119,13 @@ def step_impl(context, name):
     )
     expect(found).to_be(True)
 
+
 @then('I should not see "{name}" in the results')
 def step_impl(context, name):
     element = context.driver.find_element_by_id('search_results')
     error_msg = "I should not see '%s' in '%s'" % (name, element.text)
     ensure(name in element.text, False, error_msg)
+
 
 @then('I should see the message "{message}"')
 def step_impl(context, message):
@@ -133,6 +146,7 @@ def step_impl(context, message):
 # We can then lowercase the name and prefix with pet_ to get the id
 ##################################################################
 
+
 @then('I should see "{text_string}" in the "{element_name}" field')
 def step_impl(context, text_string, element_name):
     element_id = 'product_' + element_name.lower()
@@ -145,6 +159,7 @@ def step_impl(context, text_string, element_name):
         )
     )
     expect(found).to_be(True)
+
 
 @when('I change "{element_name}" to "{text_string}"')
 def step_impl(context, element_name, text_string):

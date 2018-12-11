@@ -36,6 +36,8 @@ DATABASE_URI = os.getenv('DATABASE_URI', None)
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
+
 class TestProductServer(unittest.TestCase):
     """ Product Server Tests """
 
@@ -97,7 +99,6 @@ class TestProductServer(unittest.TestCase):
         # print(results)
         self.assertEqual(data, results)
 
-
     def test_get_product(self):
         """ Get a single Product """
         # get the id of a product
@@ -131,7 +132,7 @@ class TestProductServer(unittest.TestCase):
         self.assertEqual(resp.status_code, status.HTTP_201_CREATED)
         # Make sure location header is set
         location = resp.headers.get('Location', None)
-        self.assertTrue(location != None)
+        self.assertTrue(location is not None)
         # Check the data is correct
         new_json = json.loads(resp.data)
         self.assertEqual(new_json['name'], 'Greek Table')
@@ -184,7 +185,8 @@ class TestProductServer(unittest.TestCase):
     def test_update_product_rating(self):
         """ Update an existing Product Rating """
         product = Product.find_by_name('Athens Table')[0]
-        # new_product = dict(id=1,name='Athens Table', description='Stupid Table', category="Fancy Table",price=20, condition="Boxed", inventory=2, review="", rating=8)
+        # new_product = dict(id=1,name='Athens Table', description='Stupid Table',
+        # category="Fancy Table",price=20, condition="Boxed", inventory=2, review="", rating=8)
         # data = json.dumps(new_product)
         resp = self.app.put('/products/rating',
                             query_string='id=1&stars=9',
@@ -293,7 +295,6 @@ class TestProductServer(unittest.TestCase):
         data = json.loads(resp.data)
         query_item = data[0]
         self.assertEqual(query_item['name'], 'Rome Chair')
-
 
     def test_query_product_list_by_category(self):
         """ Query Products by Category """

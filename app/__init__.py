@@ -17,7 +17,8 @@ db = SQLAlchemy(app)
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
 PORT = os.getenv('PORT', '5000')
 
-import service, model
+import service
+import model
 # Set up logging for production
 print('Setting up logging for {}...'.format(__name__))
 if __name__ != '__main__':
