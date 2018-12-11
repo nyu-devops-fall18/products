@@ -2,14 +2,15 @@ import sys
 import logging
 from flask import Flask, jsonify, request, url_for, make_response, abort
 from flask_api import status    # HTTP Status Codes
-from werkzeug.exceptions import NotFound, MethodNotAllowed
-from app.model import Product, ValidationError
 from flask_restplus import Api, Resource, fields, reqparse, abort
+from app.model import Product, ValidationError
 from . import app
 
 #########################
 # Index Page
 #########################
+
+
 @app.route("/", methods=['GET'])
 def index():
     app.logger.info(Product.query.all())
@@ -26,7 +27,7 @@ def index():
     #                Delete_Product="[DELETE] /products/<item_id>",
     #                Delete_All_Products="[DELETE] /products"
     #                ), status.HTTP_200_OK
-    #Please comment above return statement and uncommment the below return statement FOR BEHAVIORAL TESTING
+    #   Please comment above return statement and uncommment the below return statement FOR BEHAVIORAL TESTING
     return app.send_static_file('index.html')
 
 
@@ -34,7 +35,6 @@ def index():
 def healthcheck():
     """ Let them know our heart is still beating """
     return make_response(jsonify(status=200, message='Healthy'), status.HTTP_200_OK)
-
 
 
 ######################################################################
@@ -49,21 +49,25 @@ api = Api(app,
           # doc='/' # default also could use
           doc='/apidocs/'
           # prefix='/api'
-         )
+          )
 
 # Define the model so that the docs reflect what can be sent
 product_model = api.model('Product', {'id': fields.Integer(required=True, description='The id of the product'),
-                      'name': fields.String(required=True, description='The name of the product'),
-                      'description': fields.String(required=True, description='Detailed information about the product'),
-                      'category': fields.String(required=True, description='The category of the product'),
-                      'price': fields.Integer(required=True, description='The price of the product'),
-                      'condition': fields.String(required=True, description='The condition of the product'),
-                      'inventory': fields.Integer(required=True, description='The inventory of the product'),
-                      'review': fields.String(required=False, description='The review of the product'),
-                      'rating': fields.Integer(required=True, description='The rating of the product'),
-                      'hitCount': fields.Integer(required=False, description='The number of times product has been rated'),
-                      'updatedDate': fields.String(required=False, description="Last updated date of product")
-                     })
+                                      'name': fields.String(required=True, description='The name of the product'),
+                                      'description': fields.String(required=True,
+                                                                   description='Detailed information about product'),
+                                      'category': fields.String(required=True, description='The category of product'),
+                                      'price': fields.Integer(required=True, description='The price of the product'),
+                                      'condition': fields.String(required=True,
+                                                                 description='The condition of the product'),
+                                      'inventory': fields.Integer(required=True,
+                                                                  description='The inventory of the product'),
+                                      'review': fields.String(required=False, description='The review of the product'),
+                                      'rating': fields.Integer(required=True, description='The rating of the product'),
+                                      'hitCount': fields.Integer(required=False,
+                                                                 description='times product has been rated'),
+                                      'updatedDate': fields.String(required=False, description="updated date product")
+                                      })
 
 # query string arguments
 product_arguments = reqparse.RequestParser()
@@ -88,6 +92,7 @@ ns = api.namespace("products", description="Products API")
 #########################
 # error handlers
 # #########################
+
 
 @app.errorhandler(ValidationError)
 def request_validation_error(error):
@@ -136,6 +141,7 @@ def request_validation_error(error):
 #     app.logger.info(message)
 #     return jsonify(status=500, error='Internal Server Error', message=message), 500
 
+
 # @app.route('/products', methods=['GET'])
 @api.route('/products', strict_slashes=False)
 # @api.param('id', 'The Product identifier')
@@ -146,38 +152,28 @@ class ProductCollection(Resource):
     #########################
     @api.doc('list_products')
     @api.expect(product_arguments1)
-    @api.response(404,"Product Not Found")
+    @api.response(404, "Product Not Found")
     @api.marshal_list_with(product_model)
     def get(self):
-         """ Return all the products"""
-         products = []
-         # # id = (product_arguments1.parse_args())['id']
-         # name = (product_arguments1.parse_args())['name']
-         # category = (product_arguments1.parse_args())['category']
-         name = request.args.get('name')
-         # app.logger.info(name)
-         category = request.args.get('category')
-         # app.logger.info(category)
-         # id = request.args.get("id")
-         if name:
-             products = Product.find_by_name(name)
-         elif category:
-             products = Product.find_by_category(category)
-         # elif id:
-         #     products = Product.find_by_id(id)
-         else:
-             products = Product.all()
-         results = [product.serialize() for product in products]
-         # return make_response(jsonify(results), status.HTTP_200_OK)
-         return results,status.HTTP_200_OK
+        """ Return all the products"""
+        name = request.args.get('name')
+        category = request.args.get('category')
+        if name:
+            products = Product.find_by_name(name)
+        elif category:
+            products = Product.find_by_category(category)
+        else:
+            products = Product.all()
+        results = [product.serialize() for product in products]
+        return results, status.HTTP_200_OK
 
     #########################
     # create a product
     #########################
     @api.doc('create_products')
     @api.expect(product_model)
-    @api.response(201,"Success")
-    @api.response(400,"Validation Error")
+    @api.response(201, "Success")
+    @api.response(400, "Validation Error")
     @api.marshal_with(product_model, code=201)
     def post(self):
         """
@@ -186,7 +182,7 @@ class ProductCollection(Resource):
         """
         try:
             check_content_type('application/json')
-            product = Product(1,"","","",0,"",0,"",0)
+            product = Product(1, "", "", "", 0, "", 0, "", 0)
             # product = Product()
             # app.logger.info((api.payload))
             product.deserialize(api.payload)
@@ -197,7 +193,7 @@ class ProductCollection(Resource):
             #                      {
             #                          'Location': location_url
             #                      })
-            return product.serialize(),status.HTTP_201_CREATED,{'Location':location_url }
+            return product.serialize(), status.HTTP_201_CREATED, {'Location': location_url }
         except ValidationError:
             return request_validation_error('Invalid Data')
 
@@ -226,7 +222,7 @@ class ProductResource(Resource):
     @api.response(200, "Success")
     @api.response(404, "Product Not Found")
     # @api.marshal_with(product_model)
-    def get(self,item_id):
+    def get(self, item_id):
         """ Finds a product by ID"""
         app.logger.info('Finding a Product with id [{}]'.format(item_id))
         if not isinstance(item_id, int):
@@ -247,7 +243,7 @@ class ProductResource(Resource):
     @api.response(400, "Validation Error")
     @api.response(404, "Product Not Found")
     # @api.marshal_with(product_model)
-    def put(self,item_id):
+    def put(self, item_id):
         """ Updates a product by ID"""
         try:
             app.logger.info("Fetching the product")
@@ -257,7 +253,7 @@ class ProductResource(Resource):
             # prevrating = product.rating
             if not product:
                 # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
-                return make_response("Product with id {} not found".format(item_id),status.HTTP_404_NOT_FOUND)
+                return make_response("Product with id {} not found".format(item_id), status.HTTP_404_NOT_FOUND)
             # app.logger.info(product.deserialize(request.get_json()))
             hitcount = product.updateCount
             product.deserialize(api.payload)
@@ -266,7 +262,7 @@ class ProductResource(Resource):
             product.rating = product.totalrating/(hitcount+1)
             product.update()
             # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
-            return product.serialize(),status.HTTP_200_OK
+            return product.serialize(), status.HTTP_200_OK
         except ValidationError:
             return request_validation_error('Invalid data provided')
 
@@ -301,7 +297,7 @@ class ProductSort(Resource):
         sorted_products = Product.sort_by_date()
         results = [product.serialize() for product in sorted_products]
         # return make_response(jsonify(results), status.HTTP_200_OK)
-        return results,status.HTTP_200_OK
+        return results, status.HTTP_200_OK
 
 
 # @app.route("/products/pricerange", methods=["GET"])
@@ -324,7 +320,7 @@ class ProductPrice(Resource):
         maximum = request.args.get('maximum')
         # minimum = int((product_arguments.parse_args())['minimum'])
         # maximum = int ((product_arguments.parse_args())['maximum'])
-        tlist = list(Product.search_by_price(minimum,maximum))
+        tlist = list(Product.search_by_price(minimum, maximum))
         result = []
         for i in tlist:
             result.append(i.serialize())
@@ -345,10 +341,10 @@ class ProductRating(Resource):
     @api.doc('update_product_rating')
     @api.expect(product_arguments2)
     # @api.marshal_with(product_model)
-    @api.response(404,"Product Not Found")
+    @api.response(404, "Product Not Found")
     def put(self):
+        """Updates product rating with rating provided as stars"""
         try:
-            """Updates product rating with rating provided as stars"""
             app.logger.info("Fetching the product")
             item = request.args.get("id")
             # check_content_type("application/json")
@@ -395,8 +391,8 @@ class ProductReview(Resource):
     @api.doc('update_product_review')
     @api.expect(product_arguments3)
     # @api.marshal_with(product_model)
-    @api.response(404,"Product Not Found")
-    def put(self, ):
+    @api.response(404, "Product Not Found")
+    def put(self):
         """Updates product review with review provided as newrev"""
         app.logger.info("Fetching the product")
         item = request.args.get("id")
@@ -410,7 +406,7 @@ class ProductReview(Resource):
         print(newreview)
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
-            return make_response("Product with id {} not found".format(item),status.HTTP_404_NOT_FOUND)
+            return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
         if newreview == '' or newreview is None:
             return request_validation_error("Review should be an empty string atleast")
         elif not product.review:
@@ -433,6 +429,7 @@ def check_content_type(content_type):
     app.logger.error('Invalid Content-Type: %s', request.headers['Content-Type'])
     abort(415, 'Content-Type must be {}'.format(content_type))
 
+
 def initialize_logging(log_level=logging.INFO):
     """ Initialized the default logging to STDOUT """
     if not app.debug:
@@ -452,6 +449,7 @@ def initialize_logging(log_level=logging.INFO):
         app.logger.addHandler(handler)
         app.logger.setLevel(log_level)
         app.logger.info('Logging handler established')
+
 
 def init_db():
     """ Initialies the SQLAlchemy app """
