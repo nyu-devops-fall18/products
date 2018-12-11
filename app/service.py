@@ -152,6 +152,7 @@ class ProductCollection(Resource):
     #########################
     @api.doc('list_products')
     @api.expect(product_arguments1)
+    @api.response(200, "Success")
     @api.response(404, "Product Not Found")
     @api.marshal_list_with(product_model)
     def get(self):
@@ -202,6 +203,7 @@ class ProductCollection(Resource):
     #########################
 
     @api.doc("deleteallproducts")
+    @api.response(204, "Content Deleted")
     # @app.route("/products", methods=["DELETE"])
     def delete(self):
         """ Deletes all the products"""
@@ -220,6 +222,7 @@ class ProductResource(Resource):
     # @app.route('/products/<int:item_id>', methods=["GET"])
     @api.doc('list_products')
     @api.response(200, "Success")
+    @api.response(400, "Validation Error")
     @api.response(404, "Product Not Found")
     # @api.marshal_with(product_model)
     def get(self, item_id):
@@ -240,6 +243,7 @@ class ProductResource(Resource):
     # @api.route("/products/<int:item_id>", )
     @api.doc('update_products')
     @api.expect(product_model)
+    @api.response(200, "Success")
     @api.response(400, "Validation Error")
     @api.response(404, "Product Not Found")
     # @api.marshal_with(product_model)
@@ -270,7 +274,7 @@ class ProductResource(Resource):
     # delete product by ID
     #########################
     @api.doc('delete_products')
-    @api.response(204, "Product Deleted")
+    @api.response(204, "Content Deleted")
     def delete(self,item_id):
         """ Deletes a product by ID"""
         app.logger.info("Deleting the product for the id provided")
@@ -282,6 +286,7 @@ class ProductResource(Resource):
         # return make_response(" ", status.HTTP_204_NO_CONTENT)
         return " ", status.HTTP_204_NO_CONTENT
 
+
 @api.route('/products/latest')
 # @api.param('id', 'The Product identifier')
 class ProductSort(Resource):
@@ -290,6 +295,7 @@ class ProductSort(Resource):
     # Sort products by date
     #########################
     @api.doc('sort_products')
+    @api.response(200, "Success")
     # @api.marshal_list_with(product_model)
     def get(self):
         """List all the product by their updated date"""
@@ -310,6 +316,8 @@ class ProductPrice(Resource):
     # list products by price range
     #########################
     @api.doc('list_products_pricerange')
+    @api.response(200, "Success")
+    @api.response(400, "Validation Error")
     @api.expect(product_arguments)
     @api.marshal_list_with(product_model)
     def get(self):
@@ -318,6 +326,8 @@ class ProductPrice(Resource):
         # app.logger.info(request.args.get('minimum'))
         minimum = request.args.get('minimum')
         maximum = request.args.get('maximum')
+        if maximum is None or minimum is None:
+            return request_validation_error("Minimum and Maximum cannot be empty")
         # minimum = int((product_arguments.parse_args())['minimum'])
         # maximum = int ((product_arguments.parse_args())['maximum'])
         tlist = list(Product.search_by_price(minimum, maximum))
@@ -329,7 +339,6 @@ class ProductPrice(Resource):
         return result, status.HTTP_200_OK
 
 
-
 @api.route("/products/rating")
 # @api.param('id1', 'The Product id ')
 # @api.param('star1', 'The Product rating')
@@ -339,6 +348,9 @@ class ProductRating(Resource):
     # update product rating by ID
     #############################
     @api.doc('update_product_rating')
+    @api.response(200, "Success")
+    @api.response(400, "Validation Error")
+    @api.response(404, "Product Not Found")
     @api.expect(product_arguments2)
     # @api.marshal_with(product_model)
     @api.response(404, "Product Not Found")
@@ -391,6 +403,8 @@ class ProductReview(Resource):
     @api.doc('update_product_review')
     @api.expect(product_arguments3)
     # @api.marshal_with(product_model)
+    @api.response(200, "Success")
+    @api.response(400, "Validation Error")
     @api.response(404, "Product Not Found")
     def put(self):
         """Updates product review with review provided as newrev"""
