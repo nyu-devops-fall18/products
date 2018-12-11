@@ -353,7 +353,6 @@ class ProductRating(Resource):
     @api.response(404, "Product Not Found")
     @api.expect(product_arguments2)
     # @api.marshal_with(product_model)
-    @api.response(404, "Product Not Found")
     def put(self):
         """Updates product rating with rating provided as stars"""
         try:
@@ -363,6 +362,8 @@ class ProductRating(Resource):
             # item = (product_arguments2.parse_args())['id']
             app.logger.info(item)
             # newrating = int ((product_arguments2.parse_args())['rating'])
+            if not item:
+                return request_validation_error("Missing Parameter product ID")
             product = Product.find_by_id(item)
             newrating = request.args.get('stars')
             print(product)
@@ -387,7 +388,7 @@ class ProductRating(Resource):
             product.rating = (int(product.totalrating)/(product.updateCount + 1))
             product.update()
             # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
-            return product.serialize(),status.HTTP_200_OK
+            return product.serialize(), status.HTTP_200_OK
         except:
             return request_validation_error('Invalid request')
 

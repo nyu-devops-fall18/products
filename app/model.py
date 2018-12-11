@@ -60,6 +60,7 @@ class Product(db.Model):
 
     def update(self):
         self.updateCount += 1
+        self.updateddate = str(datetime.now())
         db.session.add(self)
         db.session.commit()
 

@@ -223,6 +223,13 @@ class TestProductServer(unittest.TestCase):
                             content_type='application/json')
         self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
 
+    def test_update_product_rating_missing_id(self):
+        """ Update an existing Product Rating with missing ID"""
+        resp = self.app.put('/products/rating',
+                            query_string='rating=9',
+                            content_type='application/json')
+        self.assertEqual(resp.status_code, status.HTTP_400_BAD_REQUEST)
+
     def test_update_product_review(self):
         """ Update an existing Product Review """
         product = Product.find_by_name('Athens Table')[0]
