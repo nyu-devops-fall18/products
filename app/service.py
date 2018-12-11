@@ -225,8 +225,6 @@ class ProductResource(Resource):
     def get(self, item_id):
         """ Finds a product by ID"""
         app.logger.info('Finding a Product with id [{}]'.format(item_id))
-        if not item_id:
-            return request_validation_error("Missing product ID")
         if not isinstance(item_id, int):
             return request_validation_error("Invalid Product ID")
         product = Product.find_by_id(item_id)
