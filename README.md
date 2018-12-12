@@ -79,3 +79,6 @@ fg
 # Services Running on Cloud
 You can also directly visit our services on cloud.
 https://nyu-product-service-f18-prod.mybluemix.net/
+
+# API Swagger Docs
+https://nyu-product-service-f18-prod.mybluemix.net/apidocs/
