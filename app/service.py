@@ -113,12 +113,18 @@ def request_validation_error(error):
 #     app.logger.info(message)
 #     return jsonify(status=400, error='Bad Request', message=message), 400
 #
-# @app.errorhandler(404)
-# def not_found(error):
-#     """ Handles resources not found with 404_NOT_FOUND """
-#     message = error.message or str(error)
-#     app.logger.info(message)
-#     return jsonify(status=404, error='Not Found', message=message), 404
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """ Handles resources not found with 404_NOT_FOUND """
+    message = str(error)
+    # app.logger.info(message)
+    return {
+               'status_code': status.HTTP_404_NOT_FOUND,
+               'error': 'Not Found',
+               'message': message
+           }, status.HTTP_404_NOT_FOUND
 #
 # @app.errorhandler(405)
 # def method_not_supported(error):
@@ -153,7 +159,6 @@ class ProductCollection(Resource):
     @api.doc('list_products')
     @api.expect(product_arguments1)
     @api.response(200, "Success")
-    @api.response(404, "Product Not Found")
     @api.marshal_list_with(product_model)
     def get(self):
         """ Return all the products"""
@@ -235,7 +240,7 @@ class ProductResource(Resource):
             # app.logger.info(product)
             return product.serialize(), status.HTTP_200_OK
         else:
-            return make_response('Product with id {} was not found'.format(item_id), status.HTTP_404_NOT_FOUND)
+            return not_found('Product ID was not found')
 
     #########################
     # update product by ID
@@ -257,7 +262,7 @@ class ProductResource(Resource):
             # prevrating = product.rating
             if not product:
                 # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item_id))
-                return make_response("Product with id {} not found".format(item_id), status.HTTP_404_NOT_FOUND)
+                return not_found("Product with id {} not found".format(item_id))
             # app.logger.info(product.deserialize(request.get_json()))
             hitcount = product.updateCount
             product.deserialize(api.payload)
@@ -370,7 +375,7 @@ class ProductRating(Resource):
             print(newrating)
             if not product:
                 # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
-                return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
+                return not_found("Product with id {} not found".format(item))
             elif newrating == '' or newrating is None:
                 return request_validation_error("Rating cannot be empty")
             elif not isinstance(int(newrating), int):
@@ -421,7 +426,7 @@ class ProductReview(Resource):
         print(newreview)
         if not product:
             # api.abort(status.HTTP_404_NotFound,'Product with id: %s was not found' % str(item))
-            return make_response("Product with id {} not found".format(item), status.HTTP_404_NOT_FOUND)
+            return not_found("Product with id {} not found".format(item))
         if newreview == '' or newreview is None:
             return request_validation_error("Review should be an empty string atleast")
         elif not product.review:
