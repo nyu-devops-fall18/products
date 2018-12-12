@@ -435,7 +435,7 @@ class ProductReview(Resource):
         else:
             product.review = str(product.review) + "|" + str(newreview)
             print(product.review)
-            product.update()
+        product.update()
         return product.serialize(), status.HTTP_200_OK
 
         # return make_response(jsonify(product.serialize()),status.HTTP_200_OK)
